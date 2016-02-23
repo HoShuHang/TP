@@ -14,12 +14,12 @@ import org.apache.commons.exec.ExecuteException;
 
 public class AndroidPythonUiautomatorExecutor {
 	final String PYTHON = "python";
-	final String TEST_SCRIPT_LOCATION = "D:\\Thesis\\PythonWorkplace\\MobileEvernoteTest\\RunTest.py";
+	final String TEST_SCRIPT_LOCATION = "C:\\Users\\User\\PycharmProjects\\MobileEvernoteTest\\RunTest.py";
 	public void executeTest(){
 		String entireCommand = PYTHON + " " + TEST_SCRIPT_LOCATION;
 		System.out.println(entireCommand);
 		
-		CommandLine commandLine = CommandLine.parse(TEST_SCRIPT_LOCATION);
+		CommandLine commandLine = CommandLine.parse(entireCommand);
 		DefaultExecutor executor = new DefaultExecutor();
 		try {
 			int exitValue = executor.execute(commandLine);
