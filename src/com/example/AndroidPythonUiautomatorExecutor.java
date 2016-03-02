@@ -74,7 +74,7 @@ public class AndroidPythonUiautomatorExecutor {
 	private void creatrePropertiesFile() throws IOException {
 		File fProperties = new File(parentPath + File.separator + FILE_PROPERTIES_TXT);
 		PrintWriter writer = new PrintWriter(fProperties, "UTF-8");
-		writer.print(TAG_MOBILE + "," + deviceNumber.get(TAG_MOBILE));
+		writer.println(TAG_MOBILE + "," + deviceNumber.get(TAG_MOBILE));
 		writer.print(TAG_WEAR + "," + deviceNumber.get(TAG_WEAR));
 		writer.close();
 	}
