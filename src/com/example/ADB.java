@@ -13,38 +13,19 @@ public class ADB {
 	public static String show() {
 		return System.getenv("ANDROID_HOME");
 	}
-	
-	public static String getSerialNumber(){
-		BufferedReader results = null;
-		String serialNumber = "";
+
+	public static List<String> getDevices() {
 		List<String> lstDevices = new ArrayList<String>();
-		try {
-			ProcessBuilder proc = new ProcessBuilder(ADB, "devices");
-			Process p = proc.start();
-			results = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = results.readLine();
-			line = results.readLine();
-			while(!line.contains("device")){
-				p = proc.start();
-				results = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				line = results.readLine();
-				line = results.readLine();
-			}
-			serialNumber = line.split("	")[0];
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return serialNumber;
-	}
-	
-	public static List<String> getDevices(){
-		List<String> lstDevices = new ArrayList<String>();
-		String[] lines = buildProcess(ADB, "devices").split("\n");
-		for(int index = 1; index < lines.length; index++){
-			lstDevices.add(lines[index].split("\t")[0]);
+		adbCmd("kill-server");
+		adbCmd("start-server");
+		List<String> lstResults = adbCmd("devices");
+
+		for(String line : lstResults){
+			if(line.contains("List of devices attached")) continue;
+			lstDevices.add(line.split("	")[0]);
 		}
 		return lstDevices;
+
 	}
 	
 	public static List<String> getDeviceName(){
@@ -52,39 +33,25 @@ public class ADB {
 		ProcessBuilder proc = new ProcessBuilder(ADB, "devices", "-l");
 		return lstDevices;
 	}
-	
-	public static String buildProcess(String... strs){
-		ProcessBuilder proc = new ProcessBuilder(strs);
-		String newLine = "", result = "";
+
+	public static List<String> adbCmd(String command) {
+		final String ANDROID_HOME = System.getenv("ANDROID_HOME");
+		final String ADB = ANDROID_HOME + "\\platform-tools\\adb.exe";
+		List<String> lstResults = new ArrayList<String>();
+//		System.out.println(command);
+		ProcessBuilder proc = new ProcessBuilder(ADB, command);
 		try {
 			Process p = proc.start();
 			BufferedReader results = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while((newLine = results.readLine()) != null && !newLine.isEmpty()){
-				result = result + newLine + "\n";
+
+			String line = "";
+			while ((line = results.readLine()) != null) {
+				lstResults.add(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return result;
+
+		return lstResults;
 	}
-	
-//	public void shell(String command){
-//		final String ANDROID_HOME = System.getenv("ANDROID_HOME");
-//		final String ADB = ANDROID_HOME + "\\platform-tools\\adb.exe";
-//		System.out.println(command);
-//		ProcessBuilder proc = new ProcessBuilder(ADB, command);
-//		try {
-//			Process p = proc.start();
-//			BufferedReader results = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//			
-//			String line = "";
-//			while((line = results.readLine()) != null){
-//				System.out.println(line);
-//			}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			
-//			e.printStackTrace();
-//		}
-//	}
 }
