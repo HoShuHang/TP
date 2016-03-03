@@ -16,9 +16,9 @@ public class ADB {
 
 	public static List<String> getDevices() {
 		List<String> lstDevices = new ArrayList<String>();
-		adbCmd("kill-server");
-		adbCmd("start-server");
-		List<String> lstResults = adbCmd("devices");
+		adbCmd(ADB, "kill-server");
+		adbCmd(ADB, "start-server");
+		List<String> lstResults = adbCmd(ADB, "devices");
 
 		for(String line : lstResults){
 			if(line.contains("List of devices attached")) continue;
@@ -34,12 +34,10 @@ public class ADB {
 		return lstDevices;
 	}
 
-	public static List<String> adbCmd(String command) {
-		final String ANDROID_HOME = System.getenv("ANDROID_HOME");
-		final String ADB = ANDROID_HOME + "\\platform-tools\\adb.exe";
+	public static List<String> adbCmd(String... command) {
 		List<String> lstResults = new ArrayList<String>();
 //		System.out.println(command);
-		ProcessBuilder proc = new ProcessBuilder(ADB, command);
+		ProcessBuilder proc = new ProcessBuilder(command);
 		try {
 			Process p = proc.start();
 			BufferedReader results = new BufferedReader(new InputStreamReader(p.getInputStream()));
