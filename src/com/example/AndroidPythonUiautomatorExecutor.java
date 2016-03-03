@@ -1,8 +1,11 @@
 package com.example;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,39 +40,67 @@ public class AndroidPythonUiautomatorExecutor {
 	}
 
 	public List<String> executeTest() {
-		final int DEFAULT_TIMEOUT = 120000;
-		String entireCommand = PYTHON + " " + testScriptLocation;
-		String cmd = "ipconfig";
-		List<String> output = null;
-		CommandLine cmdLine = CommandLine.parse(entireCommand);
-		ExecuteWatchdog watchDog = new ExecuteWatchdog(DEFAULT_TIMEOUT);
-		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-		ExecutorOutputStream outputStream = new ExecutorOutputStream();
-		PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+		List<String> output = new ArrayList<String>();
+		final String PYTHON_HOME = System.getenv("PYTHON_HOME");
+		String entireCommand = PYTHON_HOME + File.separator + PYTHON + " " + testScriptLocation;
+		ProcessBuilder proc = new ProcessBuilder(PYTHON_HOME + File.separator + PYTHON, testScriptLocation);
 		try {
+			Process p = proc.start();
+//			Process p = rt.exec("ipconfig");
+			System.out.println(entireCommand);
+			StreamConsumer errorConsumer = new StreamConsumer(p.getErrorStream(), "error");
 
-
-			DefaultExecutor executor = new DefaultExecutor();
-			executor.setExitValue(1);
-			executor.setStreamHandler(streamHandler);
-			executor.setWatchdog(watchDog);
-
-			executor.setWorkingDirectory(new File(parentPath));
-
-			creatrePropertiesFile();
-			executor.execute(cmdLine, resultHandler);
-			resultHandler.waitFor();
+//			StreamConsumer inputConsumer = new StreamConsumer(p.getInputStream(), "input");
 			
-			output = outputStream.getOutput();
+			errorConsumer.start();
+//			inputConsumer.start();
+
+			int exitVal = p.waitFor();
+			output = errorConsumer.getOutput();
+			System.out.println("ExitVal: " + exitVal);
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} finally {
-			watchDog.destroyProcess();
 		}
+
 		return output;
 	}
+
+	//保留
+//	public List<String> executeTest() {
+//		final int DEFAULT_TIMEOUT = 120000;
+//		String entireCommand = PYTHON + " " + testScriptLocation;
+//		String cmd = "ipconfig";
+//		List<String> output = null;
+//		CommandLine cmdLine = CommandLine.parse(entireCommand);
+//		ExecuteWatchdog watchDog = new ExecuteWatchdog(DEFAULT_TIMEOUT);
+//		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+//		ExecutorOutputStream outputStream = new ExecutorOutputStream();
+//		PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+//		try {
+//
+//			DefaultExecutor executor = new DefaultExecutor();
+//			executor.setExitValue(1);
+//			executor.setStreamHandler(streamHandler);
+//			executor.setWatchdog(watchDog);
+//
+//			executor.setWorkingDirectory(new File(parentPath));
+//
+//			creatrePropertiesFile();
+//			executor.execute(cmdLine, resultHandler);
+//			resultHandler.waitFor();
+//
+//			output = outputStream.getOutput();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		return output;
+//	}
 
 	private void creatrePropertiesFile() throws IOException {
 		File fProperties = new File(parentPath + File.separator + FILE_PROPERTIES_TXT);
