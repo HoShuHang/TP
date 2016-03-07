@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.exec.DefaultExecutor;
 
+import com.example.entity.Device;
+
 @WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/PythonUiAutomatorServlet" })
 public class PythonUiAutomatorServlet extends HttpServlet {
 	final String HTML_NAME_TESTSCRIPT = "testscript";
@@ -26,12 +28,18 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		System.out.println("receive request");
+		System.out.println("req = " + resp);
 		final String testScriptLocation = req.getParameter(HTML_NAME_TESTSCRIPT);
+		String test = req.getParameter("Acer_V370");
 
 		// 從index.jsp 取得mobile和wearable的serial number
 		HashMap<String, String> deviceNumber = new HashMap<String, String>();
-		deviceNumber.put(TAG_MOBILE, req.getParameter(HTML_NAME_MOBILE_SERIAL_NUMBER));
-		deviceNumber.put(TAG_WEAR, req.getParameter(HTML_NAME_WEAR_SERIAL_NUMBER));
+		for(Device device : ADB.getDevices()){
+			if(req.getParameter(device.getModelAliasWithDash())!=null)
+				deviceNumber.put(TAG_MOBILE, device.getSerialNum());
+		}
+//		deviceNumber.put(TAG_MOBILE, req.getParameter(HTML_NAME_MOBILE_SERIAL_NUMBER));
+//		deviceNumber.put(TAG_WEAR, req.getParameter(HTML_NAME_WEAR_SERIAL_NUMBER));
 
 		// 執行 command "python xxxxxxx.py" 並取得執行結果
 		List<String> output;

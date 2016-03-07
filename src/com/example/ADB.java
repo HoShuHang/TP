@@ -6,33 +6,53 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.entity.Device;
+
 public class ADB {
 	private final static String ANDROID_HOME = System.getenv("ANDROID_HOME");
-	private final static String ADB = ANDROID_HOME + "\\platform-tools\\adb.exe";
+	private final static String ADB = "/Users/adt-bundle-mac-x86_64-20140702/sdk/platform-tools/adb";
 	
 	public static String show() {
 		return System.getenv("ANDROID_HOME");
 	}
+	
+	public static List<Device> getDevices(){
+		List<Device> lstDevices = new ArrayList<Device>();
+		for(String deviceSerialNum : getDeviceSerialNums()){
+			List<String> modelAliasResult = adbCmd(ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.modelalias");
+			List<String> serialNumResult = adbCmd(ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.serialno");
+			if(modelAliasResult != null && !modelAliasResult.isEmpty()){
+				String modelAlias = modelAliasResult.get(0);
+				String serialNum = serialNumResult.get(0);
+				lstDevices.add(new Device(serialNum, modelAlias));
+			}
+		}
+		return lstDevices;
+	}
 
-	public static List<String> getDevices() {
+	public static List<String> getDeviceSerialNums() {
 		List<String> lstDevices = new ArrayList<String>();
 		adbCmd(ADB, "kill-server");
 		adbCmd(ADB, "start-server");
 		List<String> lstResults = adbCmd(ADB, "devices");
 
 		for(String line : lstResults){
-			if(line.contains("List of devices attached")) continue;
-			lstDevices.add(line.split("	")[0]);
+			if(!line.contains("List of devices attached"))
+				lstDevices.add(line.split("	")[0]);
 		}
 		return lstDevices;
 
 	}
 	
-	public static List<String> getDeviceName(){
-		List<String> lstDevices = new ArrayList<String>();
-		ProcessBuilder proc = new ProcessBuilder(ADB, "devices", "-l");
-		return lstDevices;
-	}
+//	public static List<String> getDeviceName(){
+//		List<String> lstDevices = new ArrayList<String>();
+//		for(String deviceSerialNum : getDeviceSerialNums()){
+//			List<String> result = adbCmd(ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.modelalias");
+//			if(result != null && !result.isEmpty())
+//				lstDevices.add(result.get(0));
+//		}
+//		return lstDevices;
+//	}
 
 	public static List<String> adbCmd(String... command) {
 		List<String> lstResults = new ArrayList<String>();
