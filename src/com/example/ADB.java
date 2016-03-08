@@ -19,10 +19,15 @@ public class ADB {
 		if(devices == null || devices.isEmpty()){
 			devices = new ArrayList<Device>();
 			for(String deviceSerialNum : getDeviceSerialNums()){
-				List<String> modelAliasResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.modelalias");
+				List<String> manufactorResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.manufacturer");
+				List<String> modelResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.model");
 				List<String> serialNumResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.serialno");
-				if(modelAliasResult != null && !modelAliasResult.isEmpty()){
-					String modelAlias = modelAliasResult.get(0);
+				if(manufactorResult != null && !manufactorResult.isEmpty()){
+					String modelAlias;
+					if(modelResult.get(0).contains(manufactorResult.get(0)))
+						modelAlias = modelResult.get(0);
+					else
+						modelAlias = manufactorResult.get(0) + " " + modelResult.get(0);
 					String serialNum = serialNumResult.get(0);
 					devices.add(new Device(serialNum, modelAlias));
 				}
