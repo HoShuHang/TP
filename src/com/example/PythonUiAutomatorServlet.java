@@ -13,8 +13,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
 import com.example.entity.Device;
+import com.example.utility.CoreOptions;
 
 @WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/PythonUiAutomatorServlet" })
 public class PythonUiAutomatorServlet extends HttpServlet {
@@ -28,9 +30,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		System.out.println("receive request");
-		System.out.println("req = " + resp);
-		final String testScriptLocation = req.getParameter(HTML_NAME_TESTSCRIPT);
-		String test = req.getParameter("Acer_V370");
+		final String testScriptLocation = CoreOptions.TEST_SCRIPT_DIR + "\\" + req.getParameter(HTML_NAME_TESTSCRIPT);
 
 		// 從index.jsp 取得mobile和wearable的serial number
 		HashMap<String, String> deviceNumber = new HashMap<String, String>();
