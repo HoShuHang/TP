@@ -19,9 +19,10 @@ public class ADB {
 		if(devices == null || devices.isEmpty()){
 			devices = new ArrayList<Device>();
 			for(String deviceSerialNum : getDeviceSerialNums()){
-				List<String> manufactorResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.manufacturer");
-				List<String> modelResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.model");
-				List<String> serialNumResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.serialno");
+				List<String> manufactorResult = getDeviceProp(deviceSerialNum, "ro.product.manufacturer");
+				List<String> modelResult = getDeviceProp(deviceSerialNum, "ro.product.model");
+				List<String> serialNumResult = getDeviceProp(deviceSerialNum, "ro.serialno");
+				List<String> characteristicResult = getDeviceProp(deviceSerialNum, "ro.build.characteristics");
 				if(manufactorResult != null && !manufactorResult.isEmpty()){
 					String modelAlias;
 					if(modelResult.get(0).contains(manufactorResult.get(0)))
@@ -29,7 +30,8 @@ public class ADB {
 					else
 						modelAlias = manufactorResult.get(0) + " " + modelResult.get(0);
 					String serialNum = serialNumResult.get(0);
-					devices.add(new Device(serialNum, modelAlias));
+					String characteristic = characteristicResult.get(0);
+					devices.add(new Device(serialNum, modelAlias, characteristic));
 				}
 			}
 		}
@@ -67,5 +69,9 @@ public class ADB {
 		}
 
 		return lstResults;
+	}
+	
+	private static List<String> getDeviceProp(String deviceSerialNum, String prop){
+		return adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", prop);
 	}
 }
