@@ -11,11 +11,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.utility.CoreOptions;
+
 public class AndroidPythonUiautomatorExecutor {
 	private final String PYTHON = "python.exe";
 	private final String TAG_MOBILE = "mobile";
 	private final String TAG_WEAR = "wear";
-	private final String UPLOAD_DIRECTORY = "D:\\Thesis\\UploadSpace";
 	private HashMap<String, List<String>> deviceNumber;
 	private File mainTestRunner;
 
@@ -43,8 +44,7 @@ public class AndroidPythonUiautomatorExecutor {
 
 	private List<String> execute(String snPhone, String snWear) throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
-		final String PYTHON_HOME = System.getenv("PYTHON_HOME");
-		ProcessBuilder proc = new ProcessBuilder(PYTHON_HOME + File.separator + PYTHON,
+		ProcessBuilder proc = new ProcessBuilder(CoreOptions.PYTHON_HOME + File.separator + PYTHON,
 				mainTestRunner.getAbsolutePath());
 
 		
@@ -62,7 +62,7 @@ public class AndroidPythonUiautomatorExecutor {
 
 	private void findTestRunner() throws IOException {
 		final String SETTING = "Setting";
-		File folder = new File(UPLOAD_DIRECTORY);
+		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
 //		System.out.println(folder.getPath());
 		FileFilter filter = new FileFilterWithType("py");
 		File[] files = folder.listFiles(filter);
