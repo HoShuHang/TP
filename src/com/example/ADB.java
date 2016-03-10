@@ -5,33 +5,49 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.entity.Device;
+import com.example.utility.CoreOptions;
 
 public class ADB {
-	private final static String ANDROID_HOME = System.getenv("ANDROID_HOME");
-	private final static String ADB = ANDROID_HOME + "\\platform-tools\\adb.exe";
+	private static List<Device> devices = null;
 	
 	public static String show() {
 		return System.getenv("ANDROID_HOME");
 	}
+	
+	public static List<Device> getDevices(){
+		if(devices == null || devices.isEmpty()){
+			devices = new ArrayList<Device>();
+			for(String deviceSerialNum : getDeviceSerialNums()){
+				List<String> manufactorResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.manufacturer");
+				List<String> modelResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.product.model");
+				List<String> serialNumResult = adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", "ro.serialno");
+				if(manufactorResult != null && !manufactorResult.isEmpty()){
+					String modelAlias;
+					if(modelResult.get(0).contains(manufactorResult.get(0)))
+						modelAlias = modelResult.get(0);
+					else
+						modelAlias = manufactorResult.get(0) + " " + modelResult.get(0);
+					String serialNum = serialNumResult.get(0);
+					devices.add(new Device(serialNum, modelAlias));
+				}
+			}
+		}
+		return devices;
+	}
 
-	public static List<String> getDevices() {
+	public static List<String> getDeviceSerialNums() {
 		List<String> lstDevices = new ArrayList<String>();
-		adbCmd(ADB, "kill-server");
-		adbCmd(ADB, "start-server");
-		List<String> lstResults = adbCmd(ADB, "devices");
+		adbCmd(CoreOptions.ADB, "kill-server");
+		adbCmd(CoreOptions.ADB, "start-server");
+		List<String> lstResults = adbCmd(CoreOptions.ADB, "devices");
 
 		for(String line : lstResults){
-			if(line.contains("List of devices attached")) continue;
-			lstDevices.add(line.split("	")[0]);
+			if(!line.contains("List of devices attached") && !line.isEmpty())
+				lstDevices.add(line.split("	")[0]);
 		}
 		return lstDevices;
 
-	}
-	
-	public static List<String> getDeviceName(){
-		List<String> lstDevices = new ArrayList<String>();
-		ProcessBuilder proc = new ProcessBuilder(ADB, "devices", "-l");
-		return lstDevices;
 	}
 
 	public static List<String> adbCmd(String... command) {
