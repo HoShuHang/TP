@@ -16,7 +16,7 @@
 			phones.add(device);
 		}
 	}
-	request.setAttribute("devices", devices);
+	request.setAttribute("phones", phones);
 	request.setAttribute("wearable", wearable);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
