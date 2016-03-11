@@ -36,22 +36,16 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		System.out.println("receive request");
 
-		HashMap<String, List<String>> deviceNumber = new HashMap<String, List<String>>();
-		List<String> lstPhone = new ArrayList<String>();
-		List<String> lstWear = new ArrayList<String>();
-		lstPhone.add(req.getParameter(HTML_NAME_MOBILE_SERIAL_NUMBER));
-		lstWear.add(req.getParameter(HTML_NAME_WEAR_SERIAL_NUMBER));
-		deviceNumber.put(TAG_MOBILE, lstPhone);
-		deviceNumber.put(TAG_WEAR, lstWear);
+		HashMap<String, List<Device>> deviceNumber = parseDevices(req);
 		final String testScriptLocation = CoreOptions.TEST_SCRIPT_DIR + "\\" + req.getParameter(HTML_NAME_TESTSCRIPT);
 
-//		// 從index.jsp 取得mobile和wearable的serial number
-//		HashMap<String, String> deviceNumber = new HashMap<String, String>();
-//		for(Device device : ADB.getDevices()){
-//			if(req.getParameter(device.getModelAliasWithDash())!=null)
-//				deviceNumber.put(TAG_MOBILE, device.getSerialNum());
-//		}
-		
+		// // 從index.jsp 取得mobile和wearable的serial number
+		// HashMap<String, String> deviceNumber = new HashMap<String, String>();
+		// for(Device device : ADB.getDevices()){
+		// if(req.getParameter(device.getModelAliasWithDash())!=null)
+		// deviceNumber.put(TAG_MOBILE, device.getSerialNum());
+		// }
+
 		try {
 			// upload file to server
 			for (Part part : req.getParts()) {
@@ -105,12 +99,29 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		}
 	}
 
-	private List<String> executeTest(HashMap<String, List<String>> deviceNumber)
+	private List<String> executeTest(HashMap<String, List<Device>> deviceNumber)
 			throws IOException, InterruptedException {
 		List<String> output;
 		AndroidPythonUiautomatorExecutor executor = new AndroidPythonUiautomatorExecutor(deviceNumber);
 		output = executor.executeTest();
 
 		return output;
+	}
+
+	private HashMap<String, List<Device>> parseDevices(HttpServletRequest req) {
+		HashMap<String, List<Device>> deviceNumber = new HashMap<String, List<Device>>();
+		List<Device> lstPhone = new ArrayList<Device>();
+		List<Device> lstWear = new ArrayList<Device>();
+		for (Device device : ADB.getDevices()) {
+			if (req.getParameter(device.getModelAliasWithDash()) != null) {
+				if (device.isWearable())
+					lstWear.add(device);
+				else
+					lstPhone.add(device);
+			}
+		}
+		deviceNumber.put(TAG_MOBILE, lstPhone);
+		deviceNumber.put(TAG_WEAR, lstWear);
+		return deviceNumber;
 	}
 }

@@ -11,16 +11,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import main.com.example.entity.Device;
 import main.com.example.utility.CoreOptions;
 
 public class AndroidPythonUiautomatorExecutor {
 	private final String PYTHON = "python.exe";
 	private final String TAG_MOBILE = "mobile";
 	private final String TAG_WEAR = "wear";
-	private HashMap<String, List<String>> deviceNumber;
+	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
 
-	public AndroidPythonUiautomatorExecutor(HashMap<String, List<String>> deviceNumber) {
+	public AndroidPythonUiautomatorExecutor(HashMap<String, List<Device>> deviceNumber) {
 		this.deviceNumber = deviceNumber;
 		this.mainTestRunner = null;
 	}
@@ -31,10 +32,10 @@ public class AndroidPythonUiautomatorExecutor {
 	public List<String> executeTest() throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
 		findTestRunner();
-		List<String> lstPhone = deviceNumber.get(TAG_MOBILE);
-		List<String> lstWear = deviceNumber.get(TAG_WEAR);
-		for (String phone : lstPhone) {
-			for (String wear : lstWear) {
+		List<Device> lstPhone = deviceNumber.get(TAG_MOBILE);
+		List<Device> lstWear = deviceNumber.get(TAG_WEAR);
+		for (Device phone : lstPhone) {
+			for (Device wear : lstWear) {
 				output = execute(phone, wear);
 			}
 		}
@@ -42,10 +43,10 @@ public class AndroidPythonUiautomatorExecutor {
 		return output;
 	}
 
-	private List<String> execute(String snPhone, String snWear) throws IOException, InterruptedException {
+	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
 		ProcessBuilder proc = new ProcessBuilder(CoreOptions.PYTHON_HOME + File.separator + PYTHON,
-				mainTestRunner.getAbsolutePath());
+				mainTestRunner.getAbsolutePath(), phone.getSerialNum(), wear.getSerialNum());
 
 		
 		Process p = proc.start();
