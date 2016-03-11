@@ -24,5 +24,6 @@
 	<classpathentry kind="lib" path="/Users/kevinho/Documents/eclipse_java_ee_workspace/TP/libs/taglibs-standard-impl-1.2.5.jar"/>
 	<classpathentry kind="lib" path="/Users/kevinho/Documents/eclipse_java_ee_workspace/TP/libs/taglibs-standard-jstlel-1.2.5.jar"/>
 	<classpathentry kind="lib" path="/Users/kevinho/Documents/eclipse_java_ee_workspace/TP/libs/taglibs-standard-spec-1.2.5.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="WebContent/WEB-INF/classes"/>
 </classpath>

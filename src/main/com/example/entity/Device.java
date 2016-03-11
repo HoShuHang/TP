@@ -1,4 +1,4 @@
-package com.example.entity;
+package main.com.example.entity;
 
 public class Device {
 	private String serialNum;

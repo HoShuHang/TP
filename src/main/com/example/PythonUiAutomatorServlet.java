@@ -1,4 +1,4 @@
-package com.example;
+package main.com.example;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +17,8 @@ import javax.servlet.http.Part;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
-import com.example.entity.Device;
-import com.example.utility.CoreOptions;
+import main.com.example.entity.Device;
+import main.com.example.utility.CoreOptions;
 
 @WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/PythonUiAutomatorServlet" })
 @MultipartConfig

@@ -1,4 +1,4 @@
-package com.example;
+package main.com.example;
 
 import java.io.File;
 import java.util.Map;

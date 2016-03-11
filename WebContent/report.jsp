@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=BIG5"
 	pageEncoding="BIG5"%>
 <%@ page import="java.util.List"%>
-<%@ page import="com.example.AndroidPythonUiautomatorExecutor"%>
+<%@ page import="main.com.example.AndroidPythonUiautomatorExecutor"%>
 <%
 	final String TAG_REPORT = "report";
 	final String TAG_REPORT_SIZE = TAG_REPORT + "_size";

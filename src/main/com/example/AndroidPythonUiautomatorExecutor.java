@@ -1,4 +1,4 @@
-package com.example;
+package main.com.example;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import com.example.utility.CoreOptions;
+import main.com.example.utility.CoreOptions;
 
 public class AndroidPythonUiautomatorExecutor {
 	private final String PYTHON = "python.exe";

@@ -1,12 +1,12 @@
-package com.example;
+package main.com.example;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import com.example.entity.Device;
-import com.example.utility.CoreOptions;
+import main.com.example.entity.Device;
+import main.com.example.utility.CoreOptions;
 
 public class ADB {
 	private static List<Device> devices = null;
