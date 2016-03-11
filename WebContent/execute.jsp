@@ -7,11 +7,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
 <%
 	List<Device> devices = ADB.getDevices();
+	List<Device> phones = new ArrayList<Device>();
 	List<Device> wearable = new ArrayList<Device>();
 	for(Device device : devices){
 		if(device.isWearable()){
 			wearable.add(device);
-			devices.remove(device);
+		}else{
+			phones.add(device);
 		}
 	}
 	request.setAttribute("devices", devices);
@@ -92,7 +94,7 @@
 		            <div class="col-lg-12">
 		                <h2 class="page-header">Our Phones</h2>
 		            </div>
-		            <c:forEach var="device" items="${devices}">
+		            <c:forEach var="device" items="${phones}">
 			            <div class="col-lg-4 col-sm-6 text-center">
 			                <img class="img-circle img-responsive img-centered" src="http://placehold.it/200x200" alt="">
 			                <h3><input type="checkbox" name=${ device.getModelAliasWithDash() } value=${ device.getSerialNum() } style="display:inline; margin:10px"/>${ device.getModelAlias() }</h3>
@@ -114,7 +116,7 @@
 			                <h3><input type="checkbox" name=${ device.getModelAliasWithDash() } value=${ device.getSerialNum() } style="display:inline; margin:10px"/>${ device.getModelAlias() }</h3>
 			                <p>What does this team member to? Keep it short! This is also a great spot for social links!</p>
 			            </div>
-		            </c:forEach>
+		        </c:forEach>
 		    </div>
 		</section>
 		

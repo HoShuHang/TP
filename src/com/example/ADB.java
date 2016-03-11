@@ -25,7 +25,7 @@ public class ADB {
 				List<String> characteristicResult = getDeviceProp(deviceSerialNum, "ro.build.characteristics");
 				if(manufactorResult != null && !manufactorResult.isEmpty()){
 					String modelAlias;
-					if(modelResult.get(0).contains(manufactorResult.get(0)))
+					if(modelResult.get(0).toLowerCase().contains(manufactorResult.get(0).toLowerCase()))
 						modelAlias = modelResult.get(0);
 					else
 						modelAlias = manufactorResult.get(0) + " " + modelResult.get(0);
