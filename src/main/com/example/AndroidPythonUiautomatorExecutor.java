@@ -36,7 +36,8 @@ public class AndroidPythonUiautomatorExecutor {
 		List<Device> lstWear = deviceNumber.get(TAG_WEAR);
 		for (Device phone : lstPhone) {
 			for (Device wear : lstWear) {
-				output = execute(phone, wear);
+				output.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
+				output.addAll(execute(phone, wear));
 			}
 		}
 
@@ -54,7 +55,7 @@ public class AndroidPythonUiautomatorExecutor {
 
 		errorConsumer.start();
 
-		int exitVal = p.waitFor();
+		p.waitFor();
 		output = errorConsumer.getOutput();
 //		System.out.println("ExitVal: " + exitVal);
 

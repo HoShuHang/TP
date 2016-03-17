@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
 import main.com.example.entity.Device;
 import main.com.example.utility.CoreOptions;
@@ -38,13 +36,6 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 
 		HashMap<String, List<Device>> deviceNumber = parseDevices(req);
 		final String testScriptLocation = CoreOptions.TEST_SCRIPT_DIR + "\\" + req.getParameter(HTML_NAME_TESTSCRIPT);
-
-		// // 從index.jsp 取得mobile和wearable的serial number
-		// HashMap<String, String> deviceNumber = new HashMap<String, String>();
-		// for(Device device : ADB.getDevices()){
-		// if(req.getParameter(device.getModelAliasWithDash())!=null)
-		// deviceNumber.put(TAG_MOBILE, device.getSerialNum());
-		// }
 
 		try {
 			// upload file to server
