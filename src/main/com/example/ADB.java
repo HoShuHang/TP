@@ -49,11 +49,10 @@ public class ADB {
 			adbCmd(CoreOptions.ADB, "start-server");
 			lstResults = adbCmd(CoreOptions.ADB, "devices");
 			firstResultLine = lstResults.get(0);
-			System.out.println(firstResultLine);
 			count++;
 		} while (!firstResultLine.contains("List of devices attached") && count < LIMIT);
 		
-		System.out.println("here");
+		
 		for (String line : lstResults) {
 			if (!line.contains("List of devices attached") && !line.isEmpty())
 				lstDevices.add(line.split("	")[0]);

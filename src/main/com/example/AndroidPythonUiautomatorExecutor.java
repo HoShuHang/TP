@@ -57,7 +57,6 @@ public class AndroidPythonUiautomatorExecutor {
 
 		p.waitFor();
 		output = errorConsumer.getOutput();
-//		System.out.println("ExitVal: " + exitVal);
 
 		return output;
 	}
@@ -65,7 +64,6 @@ public class AndroidPythonUiautomatorExecutor {
 	private void findTestRunner() throws IOException {
 		final String SETTING = "Setting";
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
-//		System.out.println(folder.getPath());
 		FileFilter filter = new FileFilterWithType("py");
 		File[] files = folder.listFiles(filter);
 		Arrays.sort(files, new FileSizeComparator());
