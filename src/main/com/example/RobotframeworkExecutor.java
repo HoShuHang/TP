@@ -6,11 +6,13 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import main.com.example.AndroidPythonUiautomatorExecutor.FileFilterWithType;
 import main.com.example.AndroidPythonUiautomatorExecutor.FileSizeComparator;
@@ -19,8 +21,11 @@ import main.com.example.utility.CoreOptions;
 
 public class RobotframeworkExecutor {
 	private final String PYBOT = "pybot.bat";
+	private final String TAG_MOBILE = "mobile";
+	private final String TAG_WEAR = "wear";
 	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
+	private String outputDirPath;
 
 	public RobotframeworkExecutor(HashMap<String, List<Device>> deviceNumber) {
 		this.deviceNumber = deviceNumber;
@@ -29,38 +34,52 @@ public class RobotframeworkExecutor {
 
 	public RobotframeworkExecutor() {
 	}
-
-	public List<String> executeTest() throws IOException, InterruptedException {
-		String test = "dMobile.Set Serial    CB5A259ZSX";
-		HashMap<String, String> devicesMap = new HashMap<String, String>();
-		final String REPORT_PATH = "C:" + File.separator + "Users" + File.separator + System.getenv("USERNAME")
-		+ File.separator + "report.html";
-		List<String> output = new ArrayList<String>();
-
-		findTestRunner();
-		List<String> content = readFile(mainTestRunner);
-		List<String> newContent = replace(content);
-		writeFile(mainTestRunner, newContent);
-		execute(null, null);
-		output = readFile(new File(REPORT_PATH));
-		return output;
+	
+	public void setOutputDirPath(String path){
+		this.outputDirPath = path;
 	}
 
+	public List<String> executeTest() throws IOException, InterruptedException {
+		List<String> output = new ArrayList<String>();
+		
+		findTestRunner();
+		List<String> content = readFile(mainTestRunner);
+		List<String> newContent = changeLibraryPath(content);
+		List<Device> lstPhone = deviceNumber.get(TAG_MOBILE);
+		List<Device> lstWear = deviceNumber.get(TAG_WEAR);
+		for (Device phone : lstPhone) {
+			for (Device wear : lstWear) {
+				List<String> devices = new ArrayList<String>();
+				devices.add(phone.getSerialNum());
+				devices.add(wear.getSerialNum());
+				newContent = changeSerialNumber(newContent, devices);
+				writeFile(mainTestRunner, newContent);
+				execute(phone, wear);
+			}
+		}
+		return output;
+	}
+	
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
-		ProcessBuilder proc = new ProcessBuilder(
-				CoreOptions.PYTHON_HOME + File.separator + "Scripts" + File.separator + PYBOT,
-				mainTestRunner.getAbsolutePath());
+		Process p = null;
+		try {
+			List<String> command = new ArrayList<String>();
+			command.add(PYBOT);
+			command.add("--outputdir");
+			command.add(outputDirPath + "/" + phone.getSerialNum() + "_" + wear.getSerialNum());
+			command.add(mainTestRunner.getAbsolutePath());
 
-		Process p = proc.start();
-		StreamConsumer errorConsumer = new StreamConsumer(p.getInputStream(), "error");
+			ProcessBuilder proc = new ProcessBuilder(command);
+			Map<String, String> env = proc.environment();
+			proc.redirectErrorStream(true);
+			proc.redirectOutput(new File("D:\\Thesis\\UploadSpace\\Log.txt"));
 
-		errorConsumer.start();
-
-		p.waitFor();
-		output = errorConsumer.getOutput();
-		// System.out.println("ExitVal: " + exitVal);
-
+			p = proc.start();
+			p.waitFor();
+		} finally {
+			p.destroy();
+		}
 		return output;
 	}
 
@@ -70,33 +89,40 @@ public class RobotframeworkExecutor {
 		FileFilter filter = new FileFilterWithType("txt");
 		File[] files = folder.listFiles(filter);
 		Arrays.sort(files, new FileSizeComparator());
-		mainTestRunner = files[0];
+		for (File file : files) {
+			List<String> content = readFile(file);
+			for (String line : content) {
+				if (line.contains("Test Case")) {
+					mainTestRunner = file;
+					break;
+				}
+			}
+		}
 		List<String> content = readFile(mainTestRunner);
 	}
 
 	private List<String> readFile(File file) throws IOException {
 		List<String> content = new ArrayList<String>();
-		FileReader fr = new FileReader(file);
-		BufferedReader br = new BufferedReader(fr);
-		String line = "";
-		while ((line = br.readLine()) != null) {
-			content.add(line);
+		if (file.exists()) {
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			String line = "";
+			while ((line = br.readLine()) != null) {
+				content.add(line);
+			}
+		} else {
+			System.out.println("no file");
 		}
 		return content;
 	}
 
-	private List<String> replace(List<String> content) {
+	private List<String> changeLibraryPath(List<String> content) {
 		final String MOBILE_PY = "Mobile.py";
-		final String WITH_NAME = "WITH NAME";
-		List<String> devices = new ArrayList<String>();
 		List<String> newContent = new ArrayList<String>();
 
 		for (String line : content) {
-			if (line.contains(MOBILE_PY)) {
+			if(line.contains(MOBILE_PY)) {
 				line = replaceMobilePyPath(line);
-			}
-			if (line.contains(WITH_NAME)) {
-				devices.add(getDeviceToken(line));
 			}
 			newContent.add(line);
 		}
@@ -110,16 +136,34 @@ public class RobotframeworkExecutor {
 		String newLine = "";
 		newLine += line.substring(0, 18) + MOBILE_PY_PATH;
 		newLine += line.substring(position + MOBILE_PY_PATH.length(), line.length());
-
 		return newLine;
 	}
-
-	private String getDeviceToken(String line) {
-		final String WITH_NAME = "WITH NAME";
-		String token = "";
-		int position = line.indexOf(WITH_NAME);
-		token = line.substring(position + WITH_NAME.length() + 4, line.length());
-		return token;
+	
+	private List<String> changeSerialNumber(List<String> content, List<String> devices){
+		List<String> newContent = new ArrayList<String>();
+		final String CONTAIN_KEYWORD = "Set Serial";
+		String newLine = "";
+		String space = "";
+		int index=0;
+		
+		for(int i=0 ; i<CoreOptions.INTERVAL_SPACE_NUM ; i++)
+			space += " ";
+		
+		for(String line : content){
+			newLine = line;
+			StringBuffer sb = new StringBuffer();
+			if(line.contains(CONTAIN_KEYWORD)){
+				String[] tokens = line.split(space);
+				tokens[tokens.length-1] = devices.get(index++);
+				for(String token : tokens){
+					sb.append(space);
+					sb.append(token);
+				}
+				newLine = sb.toString();
+			}
+			newContent.add(newLine);
+		}
+		return newContent;
 	}
 
 	private void writeFile(File file, List<String> content) {

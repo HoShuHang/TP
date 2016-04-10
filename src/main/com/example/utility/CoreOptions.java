@@ -6,4 +6,5 @@ public class CoreOptions {
 	public final static String ADB = ANDROID_HOME + "\\platform-tools\\adb.exe";
 	public final static String PYTHON_HOME = System.getenv("PYTHON_HOME");
 	public final static String UPLOAD_DIRECTORY = "D:\\Thesis\\UploadSpace";
+	public final static int INTERVAL_SPACE_NUM = 4;
 }
