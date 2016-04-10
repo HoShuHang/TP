@@ -55,7 +55,6 @@ public class RobotframeworkServlet extends HttpServlet {
 	}
 	
 	private void createOutputDir(){
-		System.out.println(outputDirPath);
 		File outputDir = new File(outputDirPath);
 		if(!outputDir.exists()){
 			outputDir.mkdirs();

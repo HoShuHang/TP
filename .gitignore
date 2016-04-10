@@ -3,3 +3,5 @@ WebContent/WEB-INF/classes/com/example/AndroidPythonUiautomatorExecutor.class
 WebContent/WEB-INF/classes/com/example/AndroidRobotFrameworkExecutor.class
 WebContent/WEB-INF/classes/
 bin/
+.settings/org.eclipse.ltk.core.refactoring.prefs
+.settings/org.eclipse.wst.ws.service.policy.prefs

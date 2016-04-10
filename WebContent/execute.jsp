@@ -88,6 +88,7 @@
     </nav>
     <!-- <Form Method="POST" Action="PythonUiAutomatorServlet" Enctype="Multipart/Form-Data"> -->
     <Form Method="POST" Action="RobotframeworkServlet" Enctype="Multipart/Form-Data">
+    <!--<Form Method="POST" Action="WebTestServlet">-->
 	    <section id="device">
 	        <div class="container">
 	    		<!-- Team Members Row -->
