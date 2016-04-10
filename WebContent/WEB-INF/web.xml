@@ -17,4 +17,12 @@
 		<servlet-name>PythonUiAutomatorServlet</servlet-name>
 		<url-pattern>/PythonUiAutomatorServlet</url-pattern>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>RobotframeworkServlet</servlet-name>
+		<servlet-class>main.com.example.RobotframeworkServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RobotframeworkServlet</servlet-name>
+		<url-pattern>/RobotframeworkServlet</url-pattern>
+	</servlet-mapping>
 </web-app>
