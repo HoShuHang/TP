@@ -76,9 +76,10 @@
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav navbar-right">
 				<li class="hidden"><a href="#page-top"></a></li>
-				<li class="page-scroll"><a href="#device">Devices</a></li>
+				<li class="page-scroll"><a href="#device">Phones</a></li>
 				<li class="page-scroll"><a href="#wearable">Wearable</a></li>
 				<li class="page-scroll"><a href="#script">Upload script</a></li>
+				<li class="page-scroll"><a href="#script">Upload Apk</a></li>
 			</ul>
 		</div>
 		<!-- /.navbar-collapse -->
@@ -131,6 +132,9 @@
 
 		<section id="script">
 		<div class="container">
+			<div class="col-lg-12">
+				<h2 class="page-header">Upload script</h2>
+			</div>
 			<div class="custom-file-upload">
 				<!--<label for="file">File: </label>-->
 				<input type="file" id="testscript" name="testscript" multiple />
