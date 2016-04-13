@@ -40,7 +40,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		try {
 			// upload file to server
 			for (Part part : req.getParts()) {
-				if (HTML_NAME_TESTSCRIPT.equals(part.getName())) {
+				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || "apk".equals(part.getName())) {
 					uploadToServer(part);
 				}
 			}
