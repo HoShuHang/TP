@@ -21,8 +21,6 @@ import main.com.example.utility.CoreOptions;
 
 public class AndroidRobotframeworkExecutor {
 	private final String PYBOT = "pybot.bat";
-	private final String TAG_MOBILE = "mobile";
-	private final String TAG_WEAR = "wear";
 	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
 	private String outputDirPath;
@@ -34,34 +32,144 @@ public class AndroidRobotframeworkExecutor {
 
 	public AndroidRobotframeworkExecutor() {
 	}
-	
-	public void setOutputDirPath(String path){
+
+	public void setOutputDirPath(String path) {
 		this.outputDirPath = path;
 	}
 
 	public List<String> executeTest() throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
-		
+		List<Device> lstPhone = deviceNumber.get(CoreOptions.TAG_MOBILE);
+		List<Device> lstWear = deviceNumber.get(CoreOptions.TAG_WEAR);
+
+
 		findTestRunner();
-		List<String> content = readFile(mainTestRunner);
-		List<String> newContent = changeLibraryPath(content);
-		List<Device> lstPhone = deviceNumber.get(TAG_MOBILE);
-		List<Device> lstWear = deviceNumber.get(TAG_WEAR);
 		for (Device phone : lstPhone) {
+			installApk(lstPhone);
 			for (Device wear : lstWear) {
-				List<String> devices = new ArrayList<String>();
-				devices.add(phone.getSerialNum());
-				devices.add(wear.getSerialNum());
-				newContent = changeSerialNumber(newContent, devices);
-				writeFile(mainTestRunner, newContent);
+				List<Device> devices = new ArrayList<Device>();
+				devices.add(phone);
+				devices.add(wear);
+				preprocessBeforeExecuteTestScript(devices);
+				launchApp(phone);
 				execute(phone, wear);
 			}
 		}
 		return output;
 	}
-	
+
+	private void installApk(List<Device> lstPhone) throws IOException, InterruptedException {
+		System.out.println("install apk");
+		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
+		FileFilter filter = new FileFilterWithType("apk");
+		File[] files = folder.listFiles(filter);
+		System.out.println("File size: " + files.length + " Device size: " + lstPhone.size());
+		for (Device device : lstPhone) {
+			for (File apk : files) {
+				List<String> command = new ArrayList<String>();
+				command.add(CoreOptions.ADB);
+				command.add("-s");
+				command.add(device.getSerialNum());
+				command.add("install");
+				command.add(apk.getAbsolutePath());
+
+				ProcessBuilder proc = new ProcessBuilder(command);
+				System.out.println(proc.command());
+				proc.redirectErrorStream(true);
+				proc.redirectOutput(new File(CoreOptions.LOG_PATH));
+				Process p = proc.start();
+				p.waitFor();
+			}
+		}
+	}
+
+	private void launchApp(Device phone) throws IOException, InterruptedException {
+		System.out.println("install apk");
+		final String KEY_PACKAGE = "package";
+		final String KEY_LAUNCHABLE_ACTIVITY = "launchable-activity";
+		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
+		FileFilter filter = new FileFilterWithType("apk");
+		File[] files = folder.listFiles(filter);
+
+		for (File apkFile : files) {
+			List<String> dumpContent = dumpApk(apkFile);
+			HashMap<String, String> info = getPackageAndActivity(dumpContent);
+			String packageName = info.get(KEY_PACKAGE);
+			String mainActivity = info.get(KEY_LAUNCHABLE_ACTIVITY);
+			if (packageName != null && mainActivity != null)
+				launch(phone, packageName, mainActivity);
+		}
+	}
+
+	private void launch(Device phone, String packageName, String mainActivity)
+			throws IOException, InterruptedException {
+		Process p = null;
+		ProcessBuilder proc = new ProcessBuilder(CoreOptions.ADB, "-s", phone.getSerialNum(), "shell", "am", "start",
+				"-W", "-n", packageName + "/" + mainActivity);
+		proc.redirectErrorStream(true);
+		proc.redirectErrorStream(true);
+		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
+		p = proc.start();
+		p.waitFor();
+	}
+
+	private List<String> dumpApk(File apkFile) throws IOException, InterruptedException {
+		List<String> command = new ArrayList<String>();
+		command.add(CoreOptions.ANDROID_HOME + "\\build-tools\\22.0.1\\aapt.exe");
+		command.add("dump");
+		command.add("badging");
+		command.add(apkFile.getAbsolutePath());
+
+		ProcessBuilder proc = new ProcessBuilder(command);
+		proc.redirectErrorStream(true);
+		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
+		Process p = proc.start();
+		p.waitFor();
+		return readFile(new File(CoreOptions.LOG_PATH));
+	}
+
+	private HashMap<String, String> getPackageAndActivity(List<String> content) {
+		HashMap<String, String> info = new HashMap<String, String>();
+		final String KEY_PACKAGE = "package";
+		final String KEY_LAUNCHABLE_ACTIVITY = "launchable-activity";
+		for (String line : content) {
+			if (line.contains(KEY_PACKAGE)) {
+				info.put(KEY_PACKAGE, getValue(line));
+				System.out.println(info.get(KEY_PACKAGE));
+			}
+			if (line.contains(KEY_LAUNCHABLE_ACTIVITY)) {
+				info.put(KEY_LAUNCHABLE_ACTIVITY, getValue(line));
+				System.out.println(info.get(KEY_LAUNCHABLE_ACTIVITY));
+			}
+		}
+		return info;
+	}
+
+	private String getValue(String line) {
+		final String NAME = "name";
+		String packageName = "";
+		String[] tokens = line.split(" ");
+		for (String token : tokens) {
+			if (token.contains(NAME)) {
+				int index = token.indexOf(NAME);
+				String sub = token.substring(index + NAME.length(), token.length());
+				packageName = sub.split("[=']")[2];
+			}
+		}
+		return packageName;
+	}
+
+	private void preprocessBeforeExecuteTestScript(List<Device> devices) throws IOException {
+		findTestRunner();
+		List<String> content = readFile(mainTestRunner);
+		List<String> newContent = changeLibraryPath(content);
+		newContent = changeSerialNumber(newContent, devices);
+		writeFile(mainTestRunner, newContent);
+	}
+
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
+		// final String LOG_PATH = "D:\\Thesis\\UploadSpace\\Log.txt";
 		Process p = null;
 		try {
 			List<String> command = new ArrayList<String>();
@@ -71,9 +179,8 @@ public class AndroidRobotframeworkExecutor {
 			command.add(mainTestRunner.getAbsolutePath());
 
 			ProcessBuilder proc = new ProcessBuilder(command);
-			Map<String, String> env = proc.environment();
 			proc.redirectErrorStream(true);
-			proc.redirectOutput(new File("D:\\Thesis\\UploadSpace\\Log.txt"));
+			proc.redirectOutput(new File(CoreOptions.LOG_PATH));
 
 			p = proc.start();
 			p.waitFor();
@@ -98,7 +205,6 @@ public class AndroidRobotframeworkExecutor {
 				}
 			}
 		}
-		List<String> content = readFile(mainTestRunner);
 	}
 
 	private List<String> readFile(File file) throws IOException {
@@ -121,7 +227,7 @@ public class AndroidRobotframeworkExecutor {
 		List<String> newContent = new ArrayList<String>();
 
 		for (String line : content) {
-			if(line.contains(MOBILE_PY)) {
+			if (line.contains(MOBILE_PY)) {
 				line = replaceMobilePyPath(line);
 			}
 			newContent.add(line);
@@ -138,24 +244,25 @@ public class AndroidRobotframeworkExecutor {
 		newLine += line.substring(position + MOBILE_PY_PATH.length(), line.length());
 		return newLine;
 	}
-	
-	private List<String> changeSerialNumber(List<String> content, List<String> devices){
+
+	private List<String> changeSerialNumber(List<String> content, List<Device> devices) {
 		List<String> newContent = new ArrayList<String>();
-		final String CONTAIN_KEYWORD = "Set Serial";
+		final String KERWORD_SET_SERIAL = "Set Serial";
+		final String KEYWORD_COMMENT = "comment";
 		String newLine = "";
 		String space = "";
-		int index=0;
-		
-		for(int i=0 ; i<CoreOptions.INTERVAL_SPACE_NUM ; i++)
+		int index = 0;
+
+		for (int i = 0; i < CoreOptions.INTERVAL_SPACE_NUM; i++)
 			space += " ";
-		
-		for(String line : content){
+
+		for (String line : content) {
 			newLine = line;
 			StringBuffer sb = new StringBuffer();
-			if(line.contains(CONTAIN_KEYWORD)){
+			if (line.contains(KERWORD_SET_SERIAL) && !line.contains(KEYWORD_COMMENT)) {
 				String[] tokens = line.split(space);
-				tokens[tokens.length-1] = devices.get(index++);
-				for(String token : tokens){
+				tokens[tokens.length - 1] = devices.get(index++).getSerialNum();
+				for (String token : tokens) {
 					sb.append(space);
 					sb.append(token);
 				}
@@ -197,7 +304,6 @@ public class AndroidRobotframeworkExecutor {
 	}
 
 	class FileSizeComparator implements Comparator<File> {
-
 		@Override
 		public int compare(File fa, File fb) {
 			long aSize = fa.length();
@@ -208,6 +314,5 @@ public class AndroidRobotframeworkExecutor {
 				return Long.compare(aSize, bSize);
 			}
 		}
-
 	}
 }

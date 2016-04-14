@@ -22,6 +22,7 @@ import main.com.example.utility.CoreOptions;
 @MultipartConfig
 public class RobotframeworkServlet extends HttpServlet {
 	final String HTML_NAME_TESTSCRIPT = "testscript";
+	final String HTML_NAME_APK_FILE = "apk_file";
 	// final String HTML_NAME_MOBILE_SERIAL_NUMBER = "mobile_serial_number";
 	// final String HTML_NAME_WEAR_SERIAL_NUMBER = "wear_serial_number";
 	// final String TAG_REPORT = "report";
@@ -38,7 +39,7 @@ public class RobotframeworkServlet extends HttpServlet {
 		HashMap<String, List<Device>> deviceNumber = parseDevices(req);
 		try {
 			for (Part part : req.getParts()) {
-				if (HTML_NAME_TESTSCRIPT.equals(part.getName())) {
+				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || HTML_NAME_APK_FILE.equals(part.getName())) {
 					uploadToServer(part);
 				}
 			}
