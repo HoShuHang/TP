@@ -76,9 +76,10 @@
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav navbar-right">
 				<li class="hidden"><a href="#page-top"></a></li>
-				<li class="page-scroll"><a href="#device">Devices</a></li>
+				<li class="page-scroll"><a href="#device">Phones</a></li>
 				<li class="page-scroll"><a href="#wearable">Wearable</a></li>
 				<li class="page-scroll"><a href="#script">Upload script</a></li>
+				<li class="page-scroll"><a href="#apk">Upload Apk</a></li>
 			</ul>
 		</div>
 		<!-- /.navbar-collapse -->
@@ -131,15 +132,13 @@
 
 		<section id="script">
 		<div class="container">
+			<div class="col-lg-12">
+				<h2 class="page-header">Upload script</h2>
+			</div>
 			<div class="custom-file-upload">
 				<!--<label for="file">File: </label>-->
-				<input type="file" id="testscript" name="testscript" multiple />
+				<input type="file" id="testscript" name="testscript" webkitdirectory directory multiple />
 			</div>
-			<script
-				src="//assets.codepen.io/assets/common/stopExecutionOnTimeout.js?t=1"></script>
-			<script
-				src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-			<script src="js/custom_file_upload.js" type="text/javascript"></script>
 			<!--  <div class="col-lg-12">
 			        <h2 class="page-header">Upload Script</h2>
 			    </div>
@@ -149,12 +148,30 @@
 				</div>-->
 		</div>
 		</section>
+		
+		
+		<section id="apk">
+		<div class="container">
+			<div class="col-lg-12">
+				<h2 class="page-header">Upload Apk</h2>
+			</div>
+			<div class="custom-file-upload">
+				<input type="file" id="apk" name="apk"/>
+			</div>
+		</div>
+		</section>
 
 		<div class="col-lg-8 col-lg-offset-2 text-center">
 			<div class="btn btn-default btn-lg">
 				<Input Type="Submit" Name="build">Build
 			</div>
 		</div>
+		
+			<script
+				src="//assets.codepen.io/assets/common/stopExecutionOnTimeout.js?t=1"></script>
+			<script
+				src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+			<script src="js/custom_file_upload.js" type="text/javascript"></script>
 	</Form>
 </body>
 </html>
