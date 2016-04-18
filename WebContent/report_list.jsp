@@ -14,7 +14,7 @@
 </head>
 <body>
 	<c:forEach var="pairedDevicesFolder" items="${lstPairedDeviceFolder}">
-		<a href="reports/${pairedDevicesFolder}/report.html">${pairedDevicesFolder} Report</a>
+		<a href="reports/${pairedDevicesFolder}/report.html">${pairedDevicesFolder} Report</a> <br/>
 	</c:forEach>
 </body>
 </html>

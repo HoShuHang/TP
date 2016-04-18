@@ -39,10 +39,14 @@ public class AndroidRobotframeworkExecutor {
 		List<Device> lstPhone = deviceNumber.get(CoreOptions.TAG_MOBILE);
 		List<Device> lstWear = deviceNumber.get(CoreOptions.TAG_WEAR);
 
-		
 		findTestRunner();
 		for (Device phone : lstPhone) {
-			installApk(lstPhone);
+			turnOnBluetooth(phone);
+			for(Device wear : lstWear){
+				clearWearGms(wear);
+			}
+			
+			installApk(phone);
 			for (Device wear : lstWear) {
 				List<Device> devices = new ArrayList<Device>();
 				devices.add(phone);
@@ -51,37 +55,80 @@ public class AndroidRobotframeworkExecutor {
 				launchApp(phone);
 				execute(phone, wear);
 			}
+			turnOffBluetooth(phone);
 		}
 		return output;
 	}
 
-	private void installApk(List<Device> lstPhone) throws IOException, InterruptedException {
-		System.out.println("install apk");
+	private void turnOffBluetooth(Device phone) throws IOException, InterruptedException {
+		System.out.println("【execute】 " + phone.getSerialNum());
+		List<String> command = new ArrayList<String>();
+
+		command.add(CoreOptions.PYTHON);
+		command.add(CoreOptions.SCRIPT_DIR + "\\turnOffBluetooth.py");
+		command.add(phone.getSerialNum());
+		ProcessBuilder proc = new ProcessBuilder(command);
+		proc.redirectErrorStream(true);
+		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
+		Process p = proc.start();
+		p.waitFor();
+	}
+
+	private void turnOnBluetooth(Device phone) throws IOException, InterruptedException {
+		System.out.println("【turnOnBluetooth】 " + phone.getSerialNum());
+		List<String> command = new ArrayList<String>();
+
+		command.add(CoreOptions.PYTHON);
+		command.add(CoreOptions.SCRIPT_DIR + "\\turnOnBluetooth.py");
+		command.add(phone.getSerialNum());
+		ProcessBuilder proc = new ProcessBuilder(command);
+		proc.redirectErrorStream(true);
+		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
+		Process p = proc.start();
+		p.waitFor();
+	}
+
+	private void clearWearGms(Device wear) throws IOException, InterruptedException {
+		System.out.println("【clearWearGms】 " + wear.getSerialNum());
+		List<String> command = new ArrayList<String>();
+
+		command.add(CoreOptions.PYTHON);
+		command.add(CoreOptions.SCRIPT_DIR + "\\clearGms.py");
+		command.add(wear.getSerialNum());
+		ProcessBuilder proc = new ProcessBuilder(command);
+		proc.redirectErrorStream(true);
+		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
+		Process p = proc.start();
+		p.waitFor();
+	}
+
+	private void installApk(Device phone) throws IOException, InterruptedException {
+		System.out.println("【installApk】 " + phone.getSerialNum());
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
 		FileFilter filter = new FileFilterWithType("apk");
 		File[] files = folder.listFiles(filter);
-		System.out.println("File size: " + files.length + " Device size: " + lstPhone.size());
-		for (Device device : lstPhone) {
-			for (File apk : files) {
-				List<String> command = new ArrayList<String>();
-				command.add(CoreOptions.ADB);
-				command.add("-s");
-				command.add(device.getSerialNum());
-				command.add("install");
-				command.add(apk.getAbsolutePath());
+//		System.out.println("File size: " + files.length + " Device size: " + lstPhone.size());
 
-				ProcessBuilder proc = new ProcessBuilder(command);
-				System.out.println(proc.command());
-				proc.redirectErrorStream(true);
-				proc.redirectOutput(new File(CoreOptions.LOG_PATH));
-				Process p = proc.start();
-				p.waitFor();
-			}
+		for (File apk : files) {
+			List<String> command = new ArrayList<String>();
+			command.add(CoreOptions.ADB);
+			command.add("-s");
+			command.add(phone.getSerialNum());
+			command.add("install");
+			command.add(apk.getAbsolutePath());
+
+			ProcessBuilder proc = new ProcessBuilder(command);
+			System.out.println(proc.command());
+			proc.redirectErrorStream(true);
+			proc.redirectOutput(new File(CoreOptions.LOG_PATH));
+			Process p = proc.start();
+			p.waitFor();
 		}
+
 	}
 
 	private void launchApp(Device phone) throws IOException, InterruptedException {
-		System.out.println("install apk");
+		System.out.println("【launchApp】 ");
 		final String KEY_PACKAGE = "package";
 		final String KEY_LAUNCHABLE_ACTIVITY = "launchable-activity";
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
@@ -157,6 +204,7 @@ public class AndroidRobotframeworkExecutor {
 	}
 
 	private void preprocessBeforeExecuteTestScript(List<Device> devices) throws IOException {
+		System.out.println("【preprocessBeforeExecuteTestScript】 ");
 		findTestRunner();
 		List<String> content = readFile(mainTestRunner);
 		List<String> newContent = changeLibraryPath(content);
@@ -165,8 +213,8 @@ public class AndroidRobotframeworkExecutor {
 	}
 
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
+		System.out.println("【execute】 ");
 		List<String> output = new ArrayList<String>();
-		// final String LOG_PATH = "D:\\Thesis\\UploadSpace\\Log.txt";
 		Process p = null;
 		try {
 			List<String> command = new ArrayList<String>();
@@ -188,6 +236,7 @@ public class AndroidRobotframeworkExecutor {
 	}
 
 	private void findTestRunner() throws IOException {
+		System.out.println("【findTestRunner】");
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
 		// System.out.println(folder.getPath());
 		FileFilter filter = new FileFilterWithType("txt");
