@@ -156,7 +156,7 @@
 				<h2 class="page-header">Upload Apk</h2>
 			</div>
 			<div class="custom-file-upload">
-				<input type="file" id="apk" name="apk"/>
+				<input type="file" id="apk" name="apk" multiple/>
 			</div>
 		</div>
 		</section>

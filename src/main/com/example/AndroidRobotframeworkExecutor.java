@@ -12,10 +12,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import main.com.example.AndroidPythonUiautomatorExecutor.FileFilterWithType;
-import main.com.example.AndroidPythonUiautomatorExecutor.FileSizeComparator;
 import main.com.example.entity.Device;
 import main.com.example.utility.CoreOptions;
 
@@ -42,7 +39,7 @@ public class AndroidRobotframeworkExecutor {
 		List<Device> lstPhone = deviceNumber.get(CoreOptions.TAG_MOBILE);
 		List<Device> lstWear = deviceNumber.get(CoreOptions.TAG_WEAR);
 
-
+		
 		findTestRunner();
 		for (Device phone : lstPhone) {
 			installApk(lstPhone);
