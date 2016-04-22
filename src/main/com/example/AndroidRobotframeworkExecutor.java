@@ -14,9 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import main.com.example.entity.Device;
+import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
 
-public class AndroidRobotframeworkExecutor {
+public class AndroidRobotframeworkExecutor extends Executor{
 	private final String PYBOT = "pybot.bat";
 	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
@@ -32,6 +33,12 @@ public class AndroidRobotframeworkExecutor {
 
 	public void setOutputDirPath(String path) {
 		this.outputDirPath = path;
+	}
+
+	@Override
+	public List<String> executeTest(TestData testData) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public List<String> executeTest() throws IOException, InterruptedException {

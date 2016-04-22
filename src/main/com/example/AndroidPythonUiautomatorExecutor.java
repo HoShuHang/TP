@@ -12,9 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import main.com.example.entity.Device;
+import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
 
-public class AndroidPythonUiautomatorExecutor {
+public class AndroidPythonUiautomatorExecutor extends Executor{
 	private final String PYTHON = "python.exe";
 	private final String TAG_MOBILE = "mobile";
 	private final String TAG_WEAR = "wear";
@@ -29,18 +30,18 @@ public class AndroidPythonUiautomatorExecutor {
 	public AndroidPythonUiautomatorExecutor() {
 	}
 
-	public List<String> executeTest() throws IOException, InterruptedException {
+	@Override
+	public List<String> executeTest(TestData testData) throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
-		findTestRunner();
-		List<Device> lstPhone = deviceNumber.get(TAG_MOBILE);
-		List<Device> lstWear = deviceNumber.get(TAG_WEAR);
-		for (Device phone : lstPhone) {
-			for (Device wear : lstWear) {
-				output.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
-				output.addAll(execute(phone, wear));
-			}
-		}
-
+//		findTestRunner();
+//		List<Device> lstPhone = deviceNumber.get(TAG_MOBILE);
+//		List<Device> lstWear = deviceNumber.get(TAG_WEAR);
+//		for (Device phone : lstPhone) {
+//			for (Device wear : lstWear) {
+//				output.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
+//				output.addAll(execute(phone, wear));
+//			}
+//		}
 		return output;
 	}
 
