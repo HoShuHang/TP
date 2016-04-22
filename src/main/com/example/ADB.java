@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import main.com.example.entity.Device;
 import main.com.example.utility.CoreOptions;
+import main.com.example.utility.Utility;
 
 public class ADB {
 	private static List<Device> devices = null;
@@ -45,9 +46,9 @@ public class ADB {
 		String firstResultLine = "";
 		int count = 0;
 		do {
-			adbCmd(CoreOptions.ADB, "kill-server");
-			adbCmd(CoreOptions.ADB, "start-server");
-			lstResults = adbCmd(CoreOptions.ADB, "devices");
+			Utility.cmd(CoreOptions.ADB, "kill-server");
+			Utility.cmd(CoreOptions.ADB, "start-server");
+			lstResults = Utility.cmd(CoreOptions.ADB, "devices");
 			firstResultLine = lstResults.get(0);
 			System.out.println(firstResultLine);
 			count++;
@@ -62,62 +63,7 @@ public class ADB {
 
 	}
 
-//	public static List<String> adbCmd(String... command) {
-//		List<String> lstResults = new ArrayList<String>();
-//		// System.out.println(command);
-//		ProcessBuilder proc = new ProcessBuilder(command);
-//		try {
-//			Process p = proc.start();
-//			BufferedReader results = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//
-//			String line = "";
-//			while ((line = results.readLine()) != null) {
-//				lstResults.add(line);
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//
-//		return lstResults;
-//	}
-	
-	public static List<String> adbCmd(String... command) throws InterruptedException {
-		List<String> lstResults = new ArrayList<String>();
-		// System.out.println(command);
-		ProcessBuilder proc = new ProcessBuilder(command);
-		StreamConsumer stdinConsumer = null;
-		StreamConsumer stderrConsumer = null;
-		try {
-			Process p = proc.start();
-			stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-			stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-			stdinConsumer.start();
-			stderrConsumer.start();
-			p.waitFor();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return stdinConsumer.getOutput();
-	}
-	public static List<String> adbCmdTest(String... command){
-		List<String> lstResults = new ArrayList<String>();
-		
-		ProcessBuilder proc = new ProcessBuilder(command);
-		try {
-			Process p = proc.start();
-			StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-			StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-			stdinConsumer.start();
-			stderrConsumer.start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return lstResults;
-	}
-
-	private static List<String> getDeviceProp(String deviceSerialNum, String prop) throws InterruptedException {
-		return adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", prop);
+	private static List<String> getDeviceProp(String deviceSerialNum, String prop) {
+		return Utility.cmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", prop);
 	}
 }
