@@ -11,7 +11,7 @@
 	</welcome-file-list>
 	<servlet>
 		<servlet-name>PythonUiAutomatorServlet</servlet-name>
-		<servlet-class>main.com.example.PythonUiAutomatorServlet</servlet-class>
+		<servlet-class>main.com.example.servlet.PythonUiAutomatorServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>PythonUiAutomatorServlet</servlet-name>
@@ -19,7 +19,7 @@
 	</servlet-mapping>
 	<servlet>
 		<servlet-name>RobotframeworkServlet</servlet-name>
-		<servlet-class>main.com.example.RobotframeworkServlet</servlet-class>
+		<servlet-class>main.com.example.servlet.RobotframeworkServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>RobotframeworkServlet</servlet-name>

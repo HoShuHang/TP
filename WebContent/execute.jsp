@@ -78,8 +78,7 @@
 				<li class="hidden"><a href="#page-top"></a></li>
 				<li class="page-scroll"><a href="#device">Phones</a></li>
 				<li class="page-scroll"><a href="#wearable">Wearable</a></li>
-				<li class="page-scroll"><a href="#script">Upload script</a></li>
-				<li class="page-scroll"><a href="#apk">Upload Apk</a></li>
+				<li class="page-scroll"><a href="#script">Upload</a></li>
 			</ul>
 		</div>
 		<!-- /.navbar-collapse -->
@@ -133,11 +132,11 @@
 		<section id="script">
 		<div class="container">
 			<div class="col-lg-12">
-				<h2 class="page-header">Upload script</h2>
+				<h2 class="page-header">Upload script and apk</h2>
 			</div>
 			<div class="custom-file-upload">
 				<!--<label for="file">File: </label>-->
-				<input type="file" id="testscript" name="testscript" webkitdirectory directory multiple />
+				<input type="file" id="testscript" name="testscript" accept=".zip" />
 			</div>
 			<!--  <div class="col-lg-12">
 			        <h2 class="page-header">Upload Script</h2>
@@ -146,18 +145,6 @@
 			    	Upload File
 	  				<input type="file" id="testscript" Name="testscript" multiple="multiple"/>
 				</div>-->
-		</div>
-		</section>
-		
-		
-		<section id="apk">
-		<div class="container">
-			<div class="col-lg-12">
-				<h2 class="page-header">Upload Apk</h2>
-			</div>
-			<div class="custom-file-upload">
-				<input type="file" id="apk" name="apk" multiple/>
-			</div>
 		</div>
 		</section>
 
