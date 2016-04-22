@@ -34,10 +34,11 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		System.out.println("receive request");
 
-		HashMap<String, List<Device>> deviceNumber = parseDevices(req);
+		
 		final String testScriptLocation = CoreOptions.TEST_SCRIPT_DIR + "\\" + req.getParameter(HTML_NAME_TESTSCRIPT);
 
 		try {
+			HashMap<String, List<Device>> deviceNumber = parseDevices(req);
 			// upload file to server
 			for (Part part : req.getParts()) {
 				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || "apk".equals(part.getName())) {
@@ -99,7 +100,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		return output;
 	}
 
-	private HashMap<String, List<Device>> parseDevices(HttpServletRequest req) {
+	private HashMap<String, List<Device>> parseDevices(HttpServletRequest req) throws InterruptedException {
 		HashMap<String, List<Device>> deviceNumber = new HashMap<String, List<Device>>();
 		List<Device> lstPhone = new ArrayList<Device>();
 		List<Device> lstWear = new ArrayList<Device>();

@@ -15,7 +15,7 @@ public class ADB {
 		return System.getenv("ANDROID_HOME");
 	}
 
-	public static List<Device> getDevices() {
+	public static List<Device> getDevices() throws InterruptedException {
 		if (devices == null || devices.isEmpty()) {
 			devices = new ArrayList<Device>();
 			for (String deviceSerialNum : getDeviceSerialNums()) {
@@ -38,7 +38,7 @@ public class ADB {
 		return devices;
 	}
 
-	public static List<String> getDeviceSerialNums() {
+	public static List<String> getDeviceSerialNums() throws InterruptedException {
 		final int LIMIT = 50;
 		List<String> lstDevices = new ArrayList<String>();
 		List<String> lstResults = null;
@@ -62,18 +62,54 @@ public class ADB {
 
 	}
 
-	public static List<String> adbCmd(String... command) {
+//	public static List<String> adbCmd(String... command) {
+//		List<String> lstResults = new ArrayList<String>();
+//		// System.out.println(command);
+//		ProcessBuilder proc = new ProcessBuilder(command);
+//		try {
+//			Process p = proc.start();
+//			BufferedReader results = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//
+//			String line = "";
+//			while ((line = results.readLine()) != null) {
+//				lstResults.add(line);
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//		return lstResults;
+//	}
+	
+	public static List<String> adbCmd(String... command) throws InterruptedException {
 		List<String> lstResults = new ArrayList<String>();
 		// System.out.println(command);
 		ProcessBuilder proc = new ProcessBuilder(command);
+		StreamConsumer stdinConsumer = null;
+		StreamConsumer stderrConsumer = null;
 		try {
 			Process p = proc.start();
-			BufferedReader results = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+			stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+			stdinConsumer.start();
+			stderrConsumer.start();
+			p.waitFor();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-			String line = "";
-			while ((line = results.readLine()) != null) {
-				lstResults.add(line);
-			}
+		return stdinConsumer.getOutput();
+	}
+	public static List<String> adbCmdTest(String... command){
+		List<String> lstResults = new ArrayList<String>();
+		
+		ProcessBuilder proc = new ProcessBuilder(command);
+		try {
+			Process p = proc.start();
+			StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+			StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+			stdinConsumer.start();
+			stderrConsumer.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -81,7 +117,7 @@ public class ADB {
 		return lstResults;
 	}
 
-	private static List<String> getDeviceProp(String deviceSerialNum, String prop) {
+	private static List<String> getDeviceProp(String deviceSerialNum, String prop) throws InterruptedException {
 		return adbCmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", prop);
 	}
 }

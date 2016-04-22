@@ -10,7 +10,7 @@ import java.util.List;
 
 public class StreamConsumer extends Thread {
 	InputStream is;
-	OutputStream os;
+//	OutputStream os;
 	String type;
 	List<String> output;
 
@@ -20,11 +20,16 @@ public class StreamConsumer extends Thread {
 		this.output = new ArrayList<String>();
 	}
 	
-	StreamConsumer(OutputStream os, String type){
-		this.os = os;
-		this.type = type;
+	StreamConsumer(InputStream is){
+		this.is = is;
 		this.output = new ArrayList<String>();
 	}
+	
+//	StreamConsumer(OutputStream os, String type){
+//		this.os = os;
+//		this.type = type;
+//		this.output = new ArrayList<String>();
+//	}
 
 	public void run() {
 		try {
@@ -33,7 +38,7 @@ public class StreamConsumer extends Thread {
 			String line = null;
 			while ((line = br.readLine()) != null){
 				output.add(line);
-//				System.out.println(type + ">" + line);
+				System.out.println(line);
 			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();

@@ -85,7 +85,7 @@
 		<!-- /.navbar-collapse -->
 	</div>
 	<!-- /.container-fluid --> </nav>
-	<Form Method="POST" Action="RobotframeworkServlet"
+	<Form Method="POST" Action="PythonUiAutomatorServlet"
 		Enctype="Multipart/Form-Data">
 		<section id="device">
 		<div class="container">

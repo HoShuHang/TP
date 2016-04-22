@@ -23,10 +23,6 @@ import main.com.example.utility.CoreOptions;
 public class RobotframeworkServlet extends HttpServlet {
 	final String HTML_NAME_TESTSCRIPT = "testscript";
 	final String HTML_NAME_APK_FILE = "apk_file";
-	// final String HTML_NAME_MOBILE_SERIAL_NUMBER = "mobile_serial_number";
-	// final String HTML_NAME_WEAR_SERIAL_NUMBER = "wear_serial_number";
-	// final String TAG_REPORT = "report";
-	// final String TAG_REPORT_SIZE = TAG_REPORT + "_size";
 	final String TAG_MOBILE = "mobile";
 	final String TAG_WEAR = "wear";
 	final String UPLOAD_DIRECTORY = "D:\\Thesis\\UploadSpace";
@@ -36,8 +32,9 @@ public class RobotframeworkServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		System.out.println("【RobotframeworkServlet】 receive request");
-		HashMap<String, List<Device>> deviceNumber = parseDevices(req);
+		
 		try {
+			HashMap<String, List<Device>> deviceNumber = parseDevices(req);
 			for (Part part : req.getParts()) {
 				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || HTML_NAME_APK_FILE.equals(part.getName())) {
 					uploadToServer(part);
@@ -88,7 +85,7 @@ public class RobotframeworkServlet extends HttpServlet {
 		return output;
 	}
 	
-	private HashMap<String, List<Device>> parseDevices(HttpServletRequest req) {
+	private HashMap<String, List<Device>> parseDevices(HttpServletRequest req) throws InterruptedException {
 		HashMap<String, List<Device>> deviceNumber = new HashMap<String, List<Device>>();
 		List<Device> lstPhone = new ArrayList<Device>();
 		List<Device> lstWear = new ArrayList<Device>();
