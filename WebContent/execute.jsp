@@ -76,6 +76,7 @@
 			id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav navbar-right">
 				<li class="hidden"><a href="#page-top"></a></li>
+				<li class="page-scroll"><a href="#tool">Testing tool</a></li>
 				<li class="page-scroll"><a href="#device">Phones</a></li>
 				<li class="page-scroll"><a href="#wearable">Wearable</a></li>
 				<li class="page-scroll"><a href="#script">Upload</a></li>
@@ -84,8 +85,27 @@
 		<!-- /.navbar-collapse -->
 	</div>
 	<!-- /.container-fluid --> </nav>
-	<Form Method="POST" Action="RobotframeworkServlet"
+	<Form Method="POST" Action="PythonUiAutomatorServlet"
 		Enctype="Multipart/Form-Data">
+		<section id="tool">
+		<div class="container">
+			<!-- Team Members Row -->
+			<div class="row">
+				<div class="col-lg-12">
+					<h2 class="page-header">Testing tool</h2>
+				</div>
+				<h3>
+					<input type="radio" name="tool" value="uiautomator">
+					UiAutomator
+				</h3>
+				<h3>
+					<input type="radio" name="tool" value="robotframework">
+					RobotFramework
+				</h3>
+			</div>
+		</div>
+		</section>
+
 		<section id="device">
 		<div class="container">
 			<!-- Team Members Row -->
@@ -153,12 +173,12 @@
 				<Input Type="Submit" Name="build">Build
 			</div>
 		</div>
-		
-			<script
-				src="//assets.codepen.io/assets/common/stopExecutionOnTimeout.js?t=1"></script>
-			<script
-				src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-			<script src="js/custom_file_upload.js" type="text/javascript"></script>
+
+		<script
+			src="//assets.codepen.io/assets/common/stopExecutionOnTimeout.js?t=1"></script>
+		<script
+			src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<script src="js/custom_file_upload.js" type="text/javascript"></script>
 	</Form>
 </body>
 </html>

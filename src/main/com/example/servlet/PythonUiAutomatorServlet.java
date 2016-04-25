@@ -19,10 +19,12 @@ import main.com.example.ADB;
 import main.com.example.AndroidPythonUiautomatorExecutor;
 import main.com.example.Executor;
 import main.com.example.entity.Device;
+import main.com.example.entity.ExecutorBuilder;
 import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
+import test.com.example.entity.Tool;
 
-@WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/PythonUiAutomatorServlet" })
+@WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/execute" })
 @MultipartConfig
 public class PythonUiAutomatorServlet extends HttpServlet {
 	final String HTML_NAME_TESTSCRIPT = "testscript";
@@ -37,7 +39,8 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		TestData testData = this.parseTestData(req);
-		Executor executor = new AndroidPythonUiautomatorExecutor();
+		ExecutorBuilder builder = new ExecutorBuilder();
+		Executor executor = builder.build(testData.getTool());
 		try {
 			this.executeTest(executor, testData);
 		} catch (InterruptedException e) {
@@ -49,6 +52,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		TestData testData = new TestData();
 		Part filePart = req.getPart(HTML_NAME_TESTSCRIPT);
 		testData.setProject(filePart.getSubmittedFileName(), filePart.getInputStream());
+		testData.setTool(parseTool(req));
 		filePart.write(CoreOptions.UPLOAD_DIRECTORY + File.separator + filePart.getSubmittedFileName());
 		testData.setDevices(this.parseDevices(req));
 		return testData;
@@ -62,6 +66,14 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 			}
 		}
 		return devices;
+	}
+
+	private Tool parseTool(HttpServletRequest req) {
+		String test = req.getParameter("tool");
+		if (test.equals("uiautomator"))
+			return Tool.UIAutomator;
+		else
+			return Tool.RobotFramework;
 	}
 
 	private List<String> executeTest(Executor executor, TestData testData) throws IOException, InterruptedException {
