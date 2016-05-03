@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="libs/taglibs-standard-jstlel-1.2.5.jar"/>
 	<classpathentry kind="lib" path="libs/taglibs-standard-spec-1.2.5.jar"/>
 	<classpathentry kind="lib" path="libs/commons-exec-1.3.jar"/>
+	<classpathentry kind="lib" path="libs/zip4j_1.3.2.jar"/>
 	<classpathentry kind="output" path="WebContent/WEB-INF/classes"/>
 </classpath>
