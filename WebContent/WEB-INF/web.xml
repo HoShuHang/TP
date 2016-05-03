@@ -15,7 +15,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>PythonUiAutomatorServlet</servlet-name>
-		<url-pattern>/PythonUiAutomatorServlet</url-pattern>
+		<url-pattern>/execute</url-pattern>
 	</servlet-mapping>
 	<servlet>
 		<servlet-name>RobotframeworkServlet</servlet-name>

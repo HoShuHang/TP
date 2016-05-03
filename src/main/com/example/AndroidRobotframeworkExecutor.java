@@ -17,7 +17,7 @@ import main.com.example.entity.Device;
 import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
 
-public class AndroidRobotframeworkExecutor extends Executor{
+public class AndroidRobotframeworkExecutor implements TestExecutor{
 	private final String PYBOT = "pybot.bat";
 	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
@@ -31,14 +31,13 @@ public class AndroidRobotframeworkExecutor extends Executor{
 	public AndroidRobotframeworkExecutor() {
 	}
 
-	public void setOutputDirPath(String path) {
-		this.outputDirPath = path;
+	@Override
+	public void executeTest(TestData testData) {
+		
 	}
 
-	@Override
-	public List<String> executeTest(TestData testData) {
-		// TODO Auto-generated method stub
-		return null;
+	public void setOutputDirPath(String path) {
+		this.outputDirPath = path;
 	}
 
 	public List<String> executeTest() throws IOException, InterruptedException {

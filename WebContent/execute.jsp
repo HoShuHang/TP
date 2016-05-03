@@ -85,7 +85,7 @@
 		<!-- /.navbar-collapse -->
 	</div>
 	<!-- /.container-fluid --> </nav>
-	<Form Method="POST" Action="PythonUiAutomatorServlet"
+	<Form Method="POST" Action="execute"
 		Enctype="Multipart/Form-Data">
 		<section id="tool">
 		<div class="container">
