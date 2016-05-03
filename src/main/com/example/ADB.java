@@ -16,7 +16,7 @@ public class ADB {
 		return System.getenv("ANDROID_HOME");
 	}
 
-	public static List<Device> getDevices() {
+	public static List<Device> getDevices() throws InterruptedException {
 		if (devices == null || devices.isEmpty()) {
 			devices = new ArrayList<Device>();
 			for (String deviceSerialNum : getDeviceSerialNums()) {
@@ -39,7 +39,7 @@ public class ADB {
 		return devices;
 	}
 
-	public static List<String> getDeviceSerialNums() {
+	public static List<String> getDeviceSerialNums() throws InterruptedException {
 		final int LIMIT = 50;
 		List<String> lstDevices = new ArrayList<String>();
 		List<String> lstResults = null;

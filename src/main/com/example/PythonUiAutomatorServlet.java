@@ -1,8 +1,7 @@
-package main.com.example.servlet;
+package main.com.example;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,50 +14,53 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import main.com.example.ADB;
-import main.com.example.AndroidRobotframeworkExecutor;
+
 import main.com.example.entity.Device;
 import main.com.example.utility.CoreOptions;
 
-@WebServlet(name = "RobotframeworkServlet", urlPatterns = { "/RobotframeworkServlet" })
+@WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/PythonUiAutomatorServlet" })
 @MultipartConfig
-public class RobotframeworkServlet extends HttpServlet {
+public class PythonUiAutomatorServlet extends HttpServlet {
 	final String HTML_NAME_TESTSCRIPT = "testscript";
-	final String HTML_NAME_APK_FILE = "apk_file";
+	final String HTML_NAME_MOBILE_SERIAL_NUMBER = "mobile_serial_number";
+	final String HTML_NAME_WEAR_SERIAL_NUMBER = "wear_serial_number";
+	final String TAG_REPORT = "report";
+	final String TAG_REPORT_SIZE = TAG_REPORT + "_size";
 	final String TAG_MOBILE = "mobile";
 	final String TAG_WEAR = "wear";
 	final String UPLOAD_DIRECTORY = "D:\\Thesis\\UploadSpace";
-	String outputDirPath;
-	/* (non-Javadoc)
-	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
+	final String SETTING_PY = "Setting.py";
+
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		System.out.println("【RobotframeworkServlet】 receive request");
+		System.out.println("receive request");
+
 		
+		final String testScriptLocation = CoreOptions.TEST_SCRIPT_DIR + "\\" + req.getParameter(HTML_NAME_TESTSCRIPT);
+
 		try {
 			HashMap<String, List<Device>> deviceNumber = parseDevices(req);
+			// upload file to server
 			for (Part part : req.getParts()) {
-				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || HTML_NAME_APK_FILE.equals(part.getName())) {
+				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || "apk".equals(part.getName())) {
 					uploadToServer(part);
 				}
 			}
+			List<String> output = executeTest(deviceNumber);
 
-			outputDirPath = getServletContext().getRealPath("/") + "reports";
-			createOutputDir();
-			executeTest(deviceNumber);
-			setRequestAttribute(deviceNumber, req);
-			req.getRequestDispatcher("report_list.jsp").forward(req, resp);
+			// 將結果傳去report.jsp
+			req.setAttribute(TAG_REPORT_SIZE, output.size());
+			int lineCnt = 1;
+			for (String line : output) {
+				req.setAttribute(TAG_REPORT + "_" + lineCnt++, line);
+			}
+			// go to "report.jsp"
+			req.getRequestDispatcher("report.jsp").forward(req, resp);
+
+			// After testing, delete the test scripts
+			deleteFile();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-	
-	private void createOutputDir(){
-		System.out.println(outputDirPath);
-		File outputDir = new File(outputDirPath);
-		if(!outputDir.exists()){
-			outputDir.mkdirs();
 		}
 	}
 
@@ -77,16 +79,27 @@ public class RobotframeworkServlet extends HttpServlet {
 		return null;
 	}
 
+	private void deleteFile() {
+		File uploadSpace = new File(UPLOAD_DIRECTORY);
+		File[] files = uploadSpace.listFiles();
+		for (File file : files) {
+			String name = file.getName();
+			if (name.equals(SETTING_PY))
+				continue;
+
+			file.delete();
+		}
+	}
+
 	private List<String> executeTest(HashMap<String, List<Device>> deviceNumber)
 			throws IOException, InterruptedException {
 		List<String> output;
-		AndroidRobotframeworkExecutor executor = new AndroidRobotframeworkExecutor(deviceNumber);
-		executor.setOutputDirPath(outputDirPath);
+		AndroidPythonUiautomatorExecutor executor = new AndroidPythonUiautomatorExecutor(deviceNumber);
 		output = executor.executeTest();
 
 		return output;
 	}
-	
+
 	private HashMap<String, List<Device>> parseDevices(HttpServletRequest req) throws InterruptedException {
 		HashMap<String, List<Device>> deviceNumber = new HashMap<String, List<Device>>();
 		List<Device> lstPhone = new ArrayList<Device>();
@@ -102,18 +115,5 @@ public class RobotframeworkServlet extends HttpServlet {
 		deviceNumber.put(TAG_MOBILE, lstPhone);
 		deviceNumber.put(TAG_WEAR, lstWear);
 		return deviceNumber;
-	}
-	
-	private void setRequestAttribute(HashMap<String, List<Device>> deviceNumber, HttpServletRequest req){
-		List<Device> lstPhone = deviceNumber.get(TAG_MOBILE);
-		List<Device> lstWear = deviceNumber.get(TAG_WEAR);
-		List<String> lstPairedDeviceFolder = new ArrayList<String>();
-		
-		for (Device phone : lstPhone) {
-			for (Device wear : lstWear) {
-				lstPairedDeviceFolder.add(phone.getSerialNum() + "_" + wear.getSerialNum());
-			}
-		}
-		req.setAttribute("folder", lstPairedDeviceFolder);
 	}
 }

@@ -48,10 +48,10 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		findTestRunner();
 		for (Device phone : lstPhone) {
 			turnOnBluetooth(phone);
-			for(Device wear : lstWear){
+			for (Device wear : lstWear) {
 				clearWearGms(wear);
 			}
-			
+
 			installApk(phone);
 			for (Device wear : lstWear) {
 				List<Device> devices = new ArrayList<Device>();
@@ -67,16 +67,18 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 	}
 
 	private void turnOffBluetooth(Device phone) throws IOException, InterruptedException {
-		System.out.println("【execute】 " + phone.getSerialNum());
+		System.out.println("【turnOffBluetooth】 " + phone.getSerialNum());
 		List<String> command = new ArrayList<String>();
 
 		command.add(CoreOptions.PYTHON);
 		command.add(CoreOptions.SCRIPT_DIR + "\\turnOffBluetooth.py");
 		command.add(phone.getSerialNum());
 		ProcessBuilder proc = new ProcessBuilder(command);
-		proc.redirectErrorStream(true);
-		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
 		Process p = proc.start();
+		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+		stdinConsumer.start();
+		stderrConsumer.start();
 		p.waitFor();
 	}
 
@@ -88,9 +90,11 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		command.add(CoreOptions.SCRIPT_DIR + "\\turnOnBluetooth.py");
 		command.add(phone.getSerialNum());
 		ProcessBuilder proc = new ProcessBuilder(command);
-		proc.redirectErrorStream(true);
-		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
 		Process p = proc.start();
+		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+		stdinConsumer.start();
+		stderrConsumer.start();
 		p.waitFor();
 	}
 
@@ -102,9 +106,11 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		command.add(CoreOptions.SCRIPT_DIR + "\\clearGms.py");
 		command.add(wear.getSerialNum());
 		ProcessBuilder proc = new ProcessBuilder(command);
-		proc.redirectErrorStream(true);
-		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
 		Process p = proc.start();
+		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+		stdinConsumer.start();
+		stderrConsumer.start();
 		p.waitFor();
 	}
 
@@ -113,7 +119,8 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
 		FileFilter filter = new FileFilterWithType("apk");
 		File[] files = folder.listFiles(filter);
-//		System.out.println("File size: " + files.length + " Device size: " + lstPhone.size());
+		// System.out.println("File size: " + files.length + " Device size: " +
+		// lstPhone.size());
 
 		for (File apk : files) {
 			List<String> command = new ArrayList<String>();
@@ -124,10 +131,11 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 			command.add(apk.getAbsolutePath());
 
 			ProcessBuilder proc = new ProcessBuilder(command);
-			System.out.println(proc.command());
-			proc.redirectErrorStream(true);
-			proc.redirectOutput(new File(CoreOptions.LOG_PATH));
 			Process p = proc.start();
+			StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+			StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+			stdinConsumer.start();
+			stderrConsumer.start();
 			p.waitFor();
 		}
 
@@ -140,26 +148,27 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
 		FileFilter filter = new FileFilterWithType("apk");
 		File[] files = folder.listFiles(filter);
-
+		System.out.println("apk number" + files.length);
 		for (File apkFile : files) {
 			List<String> dumpContent = dumpApk(apkFile);
 			HashMap<String, String> info = getPackageAndActivity(dumpContent);
 			String packageName = info.get(KEY_PACKAGE);
 			String mainActivity = info.get(KEY_LAUNCHABLE_ACTIVITY);
-			if (packageName != null && mainActivity != null)
+			if (packageName != null && mainActivity != null || packageName != "" && mainActivity != "") {
 				launch(phone, packageName, mainActivity);
+			}
 		}
 	}
 
 	private void launch(Device phone, String packageName, String mainActivity)
 			throws IOException, InterruptedException {
-		Process p = null;
 		ProcessBuilder proc = new ProcessBuilder(CoreOptions.ADB, "-s", phone.getSerialNum(), "shell", "am", "start",
 				"-W", "-n", packageName + "/" + mainActivity);
-		proc.redirectErrorStream(true);
-		proc.redirectErrorStream(true);
-		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
-		p = proc.start();
+		Process p = proc.start();
+		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+		stdinConsumer.start();
+		stderrConsumer.start();
 		p.waitFor();
 	}
 
@@ -171,11 +180,13 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		command.add(apkFile.getAbsolutePath());
 
 		ProcessBuilder proc = new ProcessBuilder(command);
-		proc.redirectErrorStream(true);
-		proc.redirectOutput(new File(CoreOptions.LOG_PATH));
 		Process p = proc.start();
+		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+		stdinConsumer.start();
+		stderrConsumer.start();
 		p.waitFor();
-		return readFile(new File(CoreOptions.LOG_PATH));
+		return stdinConsumer.getOutput();
 	}
 
 	private HashMap<String, String> getPackageAndActivity(List<String> content) {
@@ -230,10 +241,11 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 			command.add(mainTestRunner.getAbsolutePath());
 
 			ProcessBuilder proc = new ProcessBuilder(command);
-			proc.redirectErrorStream(true);
-			proc.redirectOutput(new File(CoreOptions.LOG_PATH));
-
 			p = proc.start();
+			StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
+			StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
+			stdinConsumer.start();
+			stderrConsumer.start();
 			p.waitFor();
 		} finally {
 			p.destroy();
@@ -301,7 +313,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		List<String> newContent = new ArrayList<String>();
 		final String KERWORD_SET_SERIAL = "Set Serial";
 		final String KEYWORD_COMMENT = "comment";
-		String newLine = "";
 		String space = "";
 		int index = 0;
 
@@ -309,18 +320,24 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 			space += " ";
 
 		for (String line : content) {
-			newLine = line;
+			System.out.println(line);
 			StringBuffer sb = new StringBuffer();
 			if (line.contains(KERWORD_SET_SERIAL) && !line.contains(KEYWORD_COMMENT)) {
+				String newLine = "";
 				String[] tokens = line.split(space);
-				tokens[tokens.length - 1] = devices.get(index++).getSerialNum();
+				tokens[tokens.length - 1] = devices.get(index++).getSerialNum(); // change
+																					// serial
+																					// number
 				for (String token : tokens) {
-					sb.append(space);
 					sb.append(token);
+					sb.append(space);
 				}
 				newLine = sb.toString();
+				newContent.add(newLine);
+				// System.out.println(newLine);
+				continue;
 			}
-			newContent.add(newLine);
+			newContent.add(line);
 		}
 		return newContent;
 	}
