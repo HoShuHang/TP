@@ -13,44 +13,38 @@ import java.util.List;
 
 import main.com.example.AndroidRobotframeworkExecutor.FileFilterWithType;
 import main.com.example.entity.Device;
+import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 
-public class AndroidPythonUiautomatorExecutor {
+public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 	private final String PYTHON = "python.exe";
 	private final String TAG_MOBILE = "mobile";
 	private final String TAG_WEAR = "wear";
 	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
 
+	// deprecated
 	public AndroidPythonUiautomatorExecutor(HashMap<String, List<Device>> deviceNumber) {
 		this.deviceNumber = deviceNumber;
 		this.mainTestRunner = null;
 	}
 
 	public AndroidPythonUiautomatorExecutor() {
-	}
+	}	
 
-	public List<String> executeTest() throws IOException, InterruptedException {
-		List<String> output = new ArrayList<String>();
-		findTestRunner();
-		List<Device> lstPhone = deviceNumber.get(TAG_MOBILE);
-		List<Device> lstWear = deviceNumber.get(TAG_WEAR);
-		
-		for (Device phone : lstPhone) {
-			turnOnBluetooth(phone);
-//			for(Device wear : lstWear){
-//				clearWearGms(wear);
-//			}
-			installApk(phone);
-			for (Device wear : lstWear) {
-				launchApp(phone);
-				output.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
-				output.addAll(execute(phone, wear));
+	@Override
+	public void executeTest(TestData testData) throws IOException, InterruptedException, ZipException {
+		int index = testData.getProjectFullPath().length() - 4;
+		findTestRunner(testData.getProjectFullPath().substring(0, index));
+		for (Device phone : testData.getPhones()) {
+			for (Device wear : testData.getWearable()) {
+				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
+				report.addAll(this.execute(phone, wear));
 			}
 			turnOffBluetooth(phone);
 		}
-
-		return output;
 	}
 	
 	private void turnOffBluetooth(Device phone) throws IOException, InterruptedException {
@@ -224,9 +218,9 @@ public class AndroidPythonUiautomatorExecutor {
 		return output;
 	}
 
-	private void findTestRunner() throws IOException {
+	private void findTestRunner(String directory) throws IOException {
 		final String SETTING = "Setting";
-		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
+		File folder = new File(directory);
 //		System.out.println(folder.getPath());
 		FileFilter filter = new FileFilterWithType("py");
 		File[] files = folder.listFiles(filter);

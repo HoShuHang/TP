@@ -15,10 +15,11 @@ import java.util.List;
 
 import main.com.example.AndroidPythonUiautomatorExecutor.FileFilterWithType;
 import main.com.example.entity.Device;
+import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
 import main.com.example.utility.Utility;
 
-public class AndroidRobotframeworkExecutor {
+public class AndroidRobotframeworkExecutor implements TestExecutor{
 	private final String PYBOT = "pybot.bat";
 	private final String TAG_APK_PATH = "apk_path";
 	private final String TAG_APK_PACKAGE = "package";
@@ -33,6 +34,11 @@ public class AndroidRobotframeworkExecutor {
 	}
 
 	public AndroidRobotframeworkExecutor() {
+	}
+
+	@Override
+	public void executeTest(TestData testData) {
+		
 	}
 
 	public void setOutputDirPath(String path) {
