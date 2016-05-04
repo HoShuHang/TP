@@ -22,6 +22,7 @@ import main.com.example.utility.CoreOptions;
 @MultipartConfig
 public class PythonUiAutomatorServlet extends HttpServlet {
 	final String HTML_NAME_TESTSCRIPT = "testscript";
+	final String HTML_NAME_APK = "apk";
 	final String HTML_NAME_MOBILE_SERIAL_NUMBER = "mobile_serial_number";
 	final String HTML_NAME_WEAR_SERIAL_NUMBER = "wear_serial_number";
 	final String TAG_REPORT = "report";
@@ -41,7 +42,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 			HashMap<String, List<Device>> deviceNumber = parseDevices(req);
 			// upload file to server
 			for (Part part : req.getParts()) {
-				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || "apk".equals(part.getName())) {
+				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || HTML_NAME_APK.equals(part.getName())) {
 					uploadToServer(part);
 				}
 			}
