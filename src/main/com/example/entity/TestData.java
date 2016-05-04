@@ -11,7 +11,6 @@ import java.util.Map;
 import main.com.example.utility.CoreOptions;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import test.com.example.entity.Tool;
 
 public class TestData {
 	private List<Device> phones, wearable = null;

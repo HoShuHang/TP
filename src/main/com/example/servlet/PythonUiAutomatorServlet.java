@@ -29,9 +29,9 @@ import main.com.example.TestExecutor;
 import main.com.example.entity.Device;
 import main.com.example.entity.ExecutorBuilder;
 import main.com.example.entity.TestData;
+import main.com.example.entity.Tool;
 import main.com.example.utility.CoreOptions;
 import net.lingala.zip4j.exception.ZipException;
-import test.com.example.entity.Tool;
 
 @WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/execute" }, asyncSupported=true)
 @MultipartConfig
@@ -58,7 +58,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		TestData testData = null;
 		try {
 			testData = this.parseTestData(req);
-		} catch (ZipException e) {
+		} catch (ZipException | InterruptedException e) {
 			e.printStackTrace();
 		}
 		ExecutorBuilder builder = new ExecutorBuilder();
@@ -79,7 +79,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		 req.getRequestDispatcher("report.jsp").forward(req, resp);
 	}
 
-	private TestData parseTestData(HttpServletRequest req) throws ServletException, IOException, ZipException {
+	private TestData parseTestData(HttpServletRequest req) throws ServletException, IOException, ZipException, InterruptedException {
 		final String HTML_NAME_TESTSCRIPT = "testscript";
 		TestData testData = new TestData();
 		Part filePart = req.getPart(HTML_NAME_TESTSCRIPT);
@@ -90,7 +90,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		return testData;
 	}
 
-	private List<Device> parseDevices(HttpServletRequest req) {
+	private List<Device> parseDevices(HttpServletRequest req) throws InterruptedException {
 		List<Device> devices = new ArrayList<Device>();
 		for (Device device : ADB.getDevices()) {
 			if (req.getParameter(device.getModelAliasWithDash()) != null) {
