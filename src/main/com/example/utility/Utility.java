@@ -21,16 +21,9 @@ public class Utility {
 			outputConsumer.start();
 			errorConsumer.start();
 			p.waitFor();
-//			BufferedReader results = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//
-//			String line = "";
-//			while ((line = results.readLine()) != null) {
-//				lstResults.add(line);
-//			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return outputConsumer.getOutput();
