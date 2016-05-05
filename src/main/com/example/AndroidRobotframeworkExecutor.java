@@ -19,7 +19,7 @@ import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
 import main.com.example.utility.Utility;
 
-public class AndroidRobotframeworkExecutor implements TestExecutor{
+public class AndroidRobotframeworkExecutor implements TestExecutor {
 	private final String PYBOT = "pybot.bat";
 	private final String TAG_APK_PATH = "apk_path";
 	private final String TAG_APK_PACKAGE = "package";
@@ -39,19 +39,15 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 	@Override
 	public void executeTest(TestData testData) throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
-//		List<Device> lstPhone = deviceNumber.get(CoreOptions.TAG_MOBILE);
-//		List<Device> lstWear = deviceNumber.get(CoreOptions.TAG_WEAR);
 		List<HashMap<String, String>> apkInfo = getApkInfo();
 
-//		findTestRunner();
+		// findTestRunner();
 		for (Device phone : testData.getPhones()) {
 			turnOnBluetooth(phone);
-			for(Device wear : testData.getWearable()){
-				clearWearGms(wear);
-			}
 			installPhoneApk(phone, apkInfo);
 			launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
+				clearWearGms(wear);
 				installWearApk(phone, apkInfo);
 				List<Device> devices = new ArrayList<Device>();
 				devices.add(phone);
@@ -108,6 +104,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 	private void installWearApk(Device phone, List<HashMap<String, String>> apkInfo) {
 		System.out.println("【installWearApk】");
 		for (HashMap<String, String> info : apkInfo) {
+			String packageName = info.get(TAG_APK_PACKAGE);
 			String launchableActivity = info.get(TAG_APK_LAUNCHABLE_ACTIVITY);
 			if (launchableActivity == null || launchableActivity == "") {
 				Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
@@ -157,25 +154,16 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 
 	private void launch(Device phone, String packageName, String mainActivity)
 			throws IOException, InterruptedException {
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\launchApk.py", phone.getSerialNum(), packageName,
-				mainActivity);
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\launchApk.py", phone.getSerialNum(),
+				packageName + "/" + mainActivity);
 	}
 
 	private List<String> dumpApk(File apkFile) throws IOException, InterruptedException {
 		List<String> command = new ArrayList<String>();
-		command.add(CoreOptions.ANDROID_HOME + "\\build-tools\\22.0.1\\aapt.exe");
-		command.add("dump");
-		command.add("badging");
-		command.add(apkFile.getAbsolutePath());
+		List<String> output = Utility.cmd(CoreOptions.ANDROID_HOME + "\\build-tools\\22.0.1\\aapt.exe", "dump",
+				"badging", apkFile.getAbsolutePath());
 
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-		return stdinConsumer.getOutput();
+		return output;
 	}
 
 	private HashMap<String, String> getPackageAndActivity(List<String> content) {
@@ -219,25 +207,10 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
 		System.out.println("【execute】 ");
-		List<String> output = new ArrayList<String>();
-		Process p = null;
-		try {
-			List<String> command = new ArrayList<String>();
-			command.add(PYBOT);
-			command.add("--outputdir");
-			command.add(outputDirPath + "/" + phone.getSerialNum() + "_" + wear.getSerialNum());
-			command.add(mainTestRunner.getAbsolutePath());
+		List<String> output = Utility.cmd(PYBOT, "--outputdir",
+				outputDirPath + "/" + phone.getSerialNum() + "_" + wear.getSerialNum(),
+				mainTestRunner.getAbsolutePath());
 
-			ProcessBuilder proc = new ProcessBuilder(command);
-			p = proc.start();
-			StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-			StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-			stdinConsumer.start();
-			stderrConsumer.start();
-			p.waitFor();
-		} finally {
-			p.destroy();
-		}
 		return output;
 	}
 
@@ -382,50 +355,17 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 
 	private void turnOffBluetooth(Device phone) throws IOException, InterruptedException {
 		System.out.println("【turnOffBluetooth】 " + phone.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\turnOffBluetooth.py");
-		command.add(phone.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\turnOffBluetooth.py", phone.getSerialNum());
 	}
 
 	private void turnOnBluetooth(Device phone) throws IOException, InterruptedException {
 		System.out.println("【turnOnBluetooth】 " + phone.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\turnOnBluetooth.py");
-		command.add(phone.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\turnOnBluetooth.py", phone.getSerialNum());
 	}
 
 	private void clearWearGms(Device wear) throws IOException, InterruptedException {
 		System.out.println("【clearWearGms】 " + wear.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\clearGms.py");
-		command.add(wear.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\clearGms.py", wear.getSerialNum());
 	}
 
 	private void installApk(Device phone, List<HashMap<String, String>> apkInfo)
