@@ -24,7 +24,7 @@ import main.com.example.utility.CoreOptions;
 @MultipartConfig
 public class RobotframeworkServlet extends HttpServlet {
 	final String HTML_NAME_TESTSCRIPT = "testscript";
-	final String HTML_NAME_APK_FILE = "apk_file";
+	final String HTML_NAME_APK = "apk";
 	final String TAG_MOBILE = "mobile";
 	final String TAG_WEAR = "wear";
 	final String UPLOAD_DIRECTORY = "D:\\Thesis\\UploadSpace";
@@ -38,14 +38,15 @@ public class RobotframeworkServlet extends HttpServlet {
 		try {
 			HashMap<String, List<Device>> deviceNumber = parseDevices(req);
 			for (Part part : req.getParts()) {
-				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || HTML_NAME_APK_FILE.equals(part.getName())) {
+				System.out.println(part.getName());
+				if (HTML_NAME_TESTSCRIPT.equals(part.getName()) || HTML_NAME_APK.equals(part.getName())) {
 					uploadToServer(part);
 				}
 			}
 
 			outputDirPath = getServletContext().getRealPath("/") + "reports";
 			createOutputDir();
-			executeTest(deviceNumber);
+//			executeTest(deviceNumber);
 			setRequestAttribute(deviceNumber, req);
 			req.getRequestDispatcher("report_list.jsp").forward(req, resp);
 		} catch (Exception e) {
@@ -77,15 +78,15 @@ public class RobotframeworkServlet extends HttpServlet {
 		return null;
 	}
 
-	private List<String> executeTest(HashMap<String, List<Device>> deviceNumber)
-			throws IOException, InterruptedException {
-		List<String> output;
-		AndroidRobotframeworkExecutor executor = new AndroidRobotframeworkExecutor(deviceNumber);
-		executor.setOutputDirPath(outputDirPath);
-		output = executor.executeTest();
-
-		return output;
-	}
+//	private List<String> executeTest(HashMap<String, List<Device>> deviceNumber)
+//			throws IOException, InterruptedException {
+//		List<String> output;
+//		AndroidRobotframeworkExecutor executor = new AndroidRobotframeworkExecutor(deviceNumber);
+//		executor.setOutputDirPath(outputDirPath);
+//		output = executor.executeTest();
+//
+//		return output;
+//	}
 	
 	private HashMap<String, List<Device>> parseDevices(HttpServletRequest req) throws InterruptedException {
 		HashMap<String, List<Device>> deviceNumber = new HashMap<String, List<Device>>();
