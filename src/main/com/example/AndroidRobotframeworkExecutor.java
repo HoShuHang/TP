@@ -37,41 +37,36 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 	}
 
 	@Override
-	public void executeTest(TestData testData) {
-		
-	}
-
-	public void setOutputDirPath(String path) {
-		this.outputDirPath = path;
-	}
-
-	public List<String> executeTest() throws IOException, InterruptedException {
+	public void executeTest(TestData testData) throws IOException, InterruptedException {
 		List<String> output = new ArrayList<String>();
-		List<Device> lstPhone = deviceNumber.get(CoreOptions.TAG_MOBILE);
-		List<Device> lstWear = deviceNumber.get(CoreOptions.TAG_WEAR);
+//		List<Device> lstPhone = deviceNumber.get(CoreOptions.TAG_MOBILE);
+//		List<Device> lstWear = deviceNumber.get(CoreOptions.TAG_WEAR);
 		List<HashMap<String, String>> apkInfo = getApkInfo();
 
-		findTestRunner();
-		for (Device phone : lstPhone) {
+//		findTestRunner();
+		for (Device phone : testData.getPhones()) {
 			turnOnBluetooth(phone);
-			for(Device wear : lstWear){
+			for(Device wear : testData.getWearable()){
 				clearWearGms(wear);
 			}
 			installPhoneApk(phone, apkInfo);
 			launchApp(phone, apkInfo);
-			for (Device wear : lstWear) {
+			for (Device wear : testData.getWearable()) {
 				installWearApk(phone, apkInfo);
 				List<Device> devices = new ArrayList<Device>();
 				devices.add(phone);
 				devices.add(wear);
-				preprocessBeforeExecuteTestScript(devices);
+				preprocessBeforeExecuteTestScript(testData, devices);
 				execute(phone, wear);
 				uninstallWearApk(phone, apkInfo);
 			}
 			uninstallPhoneApk(phone, apkInfo);
 			turnOffBluetooth(phone);
 		}
-		return output;
+	}
+
+	public void setOutputDirPath(String path) {
+		this.outputDirPath = path;
 	}
 
 	/* get file path, package and launchable-activity from apk */
@@ -119,11 +114,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 						info.get(TAG_APK_PATH));
 			}
 		}
-	}
-	
-	private void waitWearInstall(Device wear){
-		System.out.println("【waitWearInstall】");
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\waitWearInstallApp.py", wear.getSerialNum());
 	}
 
 	private void uninstallWearApk(Device phone, List<HashMap<String, String>> apkInfo) {
@@ -217,9 +207,10 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		return packageName;
 	}
 
-	private void preprocessBeforeExecuteTestScript(List<Device> devices) throws IOException {
+	private void preprocessBeforeExecuteTestScript(TestData testData, List<Device> devices) throws IOException {
 		System.out.println("【preprocessBeforeExecuteTestScript】 ");
-		findTestRunner();
+		int index = testData.getProjectFullPath().length() - 4;
+		findTestRunner(testData.getProjectFullPath().substring(0, index));
 		List<String> content = readFile(mainTestRunner);
 		List<String> newContent = changeLibraryPath(content);
 		newContent = changeSerialNumber(newContent, devices);
@@ -250,9 +241,9 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 		return output;
 	}
 
-	private void findTestRunner() throws IOException {
+	private void findTestRunner(String directory) throws IOException {
 		System.out.println("【findTestRunner】");
-		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
+		File folder = new File(directory);
 		// System.out.println(folder.getPath());
 		FileFilter filter = new FileFilterWithType("txt");
 		File[] files = folder.listFiles(filter);
@@ -298,12 +289,21 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 	}
 
 	private String replaceMobilePyPath(String line) {
-		final String MOBILE_PY_PATH = "robotframework-uiautomatorlibrary-0.1/uiautomatorlibrary/Mobile.py";
-		int position = line.indexOf(MOBILE_PY_PATH);
-		String newLine = "";
-		newLine += line.substring(0, 18) + MOBILE_PY_PATH;
-		newLine += line.substring(position + MOBILE_PY_PATH.length(), line.length());
-		return newLine;
+		final String MOBILE_PY_PATH = "D:/Thesis/robotframework-uiautomatorlibrary-0.1/uiautomatorlibrary/Mobile.py";
+		final String IMPORT_INTERVAL_SPACE = "           ";
+		final String GENERAL_INTERVAL_SPACE = "    ";
+		StringBuffer sb = new StringBuffer();
+		String[] tokens = line.split("\\s+");
+		sb.append(tokens[0]);
+		sb.append(IMPORT_INTERVAL_SPACE);
+		sb.append(MOBILE_PY_PATH);
+		sb.append(GENERAL_INTERVAL_SPACE);
+		sb.append(tokens[2]);
+		sb.append(" ");
+		sb.append(tokens[3]);
+		sb.append(GENERAL_INTERVAL_SPACE);
+		sb.append(tokens[4]);
+		return sb.toString();
 	}
 
 	private List<String> changeSerialNumber(List<String> content, List<Device> devices) {

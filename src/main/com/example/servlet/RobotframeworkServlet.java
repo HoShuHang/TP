@@ -46,7 +46,7 @@ public class RobotframeworkServlet extends HttpServlet {
 
 			outputDirPath = getServletContext().getRealPath("/") + "reports";
 			createOutputDir();
-			executeTest(deviceNumber);
+//			executeTest(deviceNumber);
 			setRequestAttribute(deviceNumber, req);
 			req.getRequestDispatcher("report_list.jsp").forward(req, resp);
 		} catch (Exception e) {
@@ -78,15 +78,15 @@ public class RobotframeworkServlet extends HttpServlet {
 		return null;
 	}
 
-	private List<String> executeTest(HashMap<String, List<Device>> deviceNumber)
-			throws IOException, InterruptedException {
-		List<String> output;
-		AndroidRobotframeworkExecutor executor = new AndroidRobotframeworkExecutor(deviceNumber);
-		executor.setOutputDirPath(outputDirPath);
-		output = executor.executeTest();
-
-		return output;
-	}
+//	private List<String> executeTest(HashMap<String, List<Device>> deviceNumber)
+//			throws IOException, InterruptedException {
+//		List<String> output;
+//		AndroidRobotframeworkExecutor executor = new AndroidRobotframeworkExecutor(deviceNumber);
+//		executor.setOutputDirPath(outputDirPath);
+//		output = executor.executeTest();
+//
+//		return output;
+//	}
 	
 	private HashMap<String, List<Device>> parseDevices(HttpServletRequest req) throws InterruptedException {
 		HashMap<String, List<Device>> deviceNumber = new HashMap<String, List<Device>>();
