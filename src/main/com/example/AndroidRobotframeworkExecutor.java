@@ -38,25 +38,24 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 
 	@Override
 	public void executeTest(TestData testData) throws IOException, InterruptedException {
-		List<String> output = new ArrayList<String>();
-		List<HashMap<String, String>> apkInfo = getApkInfo();
+		HashMap<String, HashMap<String, String>> apkInfo = getApkInfo();
 
 		// findTestRunner();
 		for (Device phone : testData.getPhones()) {
 			turnOnBluetooth(phone);
-			installPhoneApk(phone, apkInfo);
+			installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
 			launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
 				clearWearGms(wear);
-				installWearApk(phone, apkInfo);
+				installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
 				List<Device> devices = new ArrayList<Device>();
 				devices.add(phone);
 				devices.add(wear);
 				preprocessBeforeExecuteTestScript(testData, devices);
 				execute(phone, wear);
-				uninstallWearApk(phone, apkInfo);
+				uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
 			}
-			uninstallPhoneApk(phone, apkInfo);
+			uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE));
 			turnOffBluetooth(phone);
 		}
 	}
@@ -66,18 +65,23 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 	}
 
 	/* get file path, package and launchable-activity from apk */
-	private List<HashMap<String, String>> getApkInfo() {
-		List<HashMap<String, String>> apkInfo = new ArrayList<HashMap<String, String>>();
+	private HashMap<String, HashMap<String, String>> getApkInfo() {
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
 		FileFilter filter = new FileFilterWithType("apk");
 		File[] files = folder.listFiles(filter);
-
+		HashMap<String, HashMap<String, String>> apkInfo = new HashMap<String, HashMap<String, String>>();
 		for (File file : files) {
+			String tagDevice = CoreOptions.TAG_WEAR;
 			HashMap<String, String> info = new HashMap<String, String>();
+			String packageName = getSpecValue(file, TAG_APK_PACKAGE);
+			String launchableActivity = getSpecValue(file, TAG_APK_LAUNCHABLE_ACTIVITY);
+			if (launchableActivity != null && !launchableActivity.isEmpty())
+				tagDevice = CoreOptions.TAG_MOBILE;
+			System.out.println("tag: " + tagDevice);
 			info.put(TAG_APK_PATH, file.getAbsolutePath());
-			info.put(TAG_APK_PACKAGE, getSpecValue(file, TAG_APK_PACKAGE));
-			info.put(TAG_APK_LAUNCHABLE_ACTIVITY, getSpecValue(file, TAG_APK_LAUNCHABLE_ACTIVITY));
-			apkInfo.add(info);
+			info.put(TAG_APK_PACKAGE, packageName);
+			info.put(TAG_APK_LAUNCHABLE_ACTIVITY, launchableActivity);
+			apkInfo.put(tagDevice, info);
 		}
 		return apkInfo;
 
@@ -86,113 +90,47 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 	private String getSpecValue(File apk, String target) {
 		List<String> result = Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\ApkInfoGetter.py",
 				apk.getAbsolutePath(), target);
-		return result.get(0);
+		return result.get(0).replaceAll("\\r\\n", "");
 	}
 
-	private void installPhoneApk(Device phone, List<HashMap<String, String>> apkInfo) {
+	private void installApk(Device phone, String apkPath) {
 		System.out.println("【installPhoneApk】");
-		for (HashMap<String, String> info : apkInfo) {
-			String packageName = info.get(TAG_APK_PACKAGE);
-			String launchableActivity = info.get(TAG_APK_LAUNCHABLE_ACTIVITY);
-			if (launchableActivity != null && launchableActivity != "") {
-				Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
-						info.get(TAG_APK_PATH));
-			}
-		}
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
+				apkPath);
 	}
 
-	private void installWearApk(Device phone, List<HashMap<String, String>> apkInfo) {
+	private void installWearApk(Device phone, HashMap<String, HashMap<String, String>> apkInfo) {
 		System.out.println("【installWearApk】");
-		for (HashMap<String, String> info : apkInfo) {
-			String packageName = info.get(TAG_APK_PACKAGE);
-			String launchableActivity = info.get(TAG_APK_LAUNCHABLE_ACTIVITY);
-			if (launchableActivity == null || launchableActivity == "") {
-				Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
-						info.get(TAG_APK_PATH));
-			}
-		}
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
+				apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
 	}
 
-	private void uninstallWearApk(Device phone, List<HashMap<String, String>> apkInfo) {
+	private void uninstallApk(Device phone, String packageName) {
 		System.out.println("【uninstallWearApk】");
-		for (HashMap<String, String> info : apkInfo) {
-			String packageName = info.get(TAG_APK_PACKAGE);
-			String launchableActivity = info.get(TAG_APK_LAUNCHABLE_ACTIVITY);
-			// wear app has no launchable-activity
-			if (launchableActivity == null || launchableActivity == "") {
-				Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
-						packageName);
-			}
-		}
+//		String packageName = apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE);
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
+				packageName);
 	}
 
-	private void uninstallPhoneApk(Device phone, List<HashMap<String, String>> apkInfo) {
+	private void uninstallPhoneApk(Device phone, HashMap<String, HashMap<String, String>> apkInfo) {
 		System.out.println("【uninstallPhoneApk】");
-		for (HashMap<String, String> info : apkInfo) {
-			String packageName = info.get(TAG_APK_PACKAGE);
-			String launchableActivity = info.get(TAG_APK_LAUNCHABLE_ACTIVITY);
-			// wear app has no launchable-activity
-			if (launchableActivity != null && launchableActivity != "") {
+			String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE);
 				Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
 						packageName);
-			}
-		}
 	}
 
-	private void launchApp(Device phone, List<HashMap<String, String>> apkInfo)
+	private void launchApp(Device phone, HashMap<String, HashMap<String, String>> apkInfo)
 			throws IOException, InterruptedException {
 		System.out.println("【launchApp】 ");
-		for (HashMap<String, String> info : apkInfo) {
-			String packageName = info.get(TAG_APK_PACKAGE);
-			String launchableActivity = info.get(TAG_APK_LAUNCHABLE_ACTIVITY);
-			// wear app has no launchable-activity
-			if (launchableActivity != null && launchableActivity != "") {
-				launch(phone, packageName, launchableActivity);
-			}
-		}
+		String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE);
+		String launchableActivity = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_LAUNCHABLE_ACTIVITY);
+		launch(phone, packageName, launchableActivity);
 	}
 
 	private void launch(Device phone, String packageName, String mainActivity)
 			throws IOException, InterruptedException {
 		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\launchApk.py", phone.getSerialNum(),
 				packageName + "/" + mainActivity);
-	}
-
-	private List<String> dumpApk(File apkFile) throws IOException, InterruptedException {
-		List<String> command = new ArrayList<String>();
-		List<String> output = Utility.cmd(CoreOptions.ANDROID_HOME + "\\build-tools\\22.0.1\\aapt.exe", "dump",
-				"badging", apkFile.getAbsolutePath());
-
-		return output;
-	}
-
-	private HashMap<String, String> getPackageAndActivity(List<String> content) {
-		HashMap<String, String> info = new HashMap<String, String>();
-		final String KEY_PACKAGE = "package";
-		final String KEY_LAUNCHABLE_ACTIVITY = "launchable-activity";
-		for (String line : content) {
-			if (line.contains(KEY_PACKAGE)) {
-				info.put(KEY_PACKAGE, getValue(line));
-			}
-			if (line.contains(KEY_LAUNCHABLE_ACTIVITY)) {
-				info.put(KEY_LAUNCHABLE_ACTIVITY, getValue(line));
-			}
-		}
-		return info;
-	}
-
-	private String getValue(String line) {
-		final String NAME = "name";
-		String packageName = "";
-		String[] tokens = line.split(" ");
-		for (String token : tokens) {
-			if (token.contains(NAME)) {
-				int index = token.indexOf(NAME);
-				String sub = token.substring(index + NAME.length(), token.length());
-				packageName = sub.split("[=']")[2];
-			}
-		}
-		return packageName;
 	}
 
 	private void preprocessBeforeExecuteTestScript(TestData testData, List<Device> devices) throws IOException {
@@ -368,13 +306,4 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\clearGms.py", wear.getSerialNum());
 	}
 
-	private void installApk(Device phone, List<HashMap<String, String>> apkInfo)
-			throws IOException, InterruptedException {
-		for (HashMap<String, String> info : apkInfo) {
-			List<String> command = new ArrayList<String>();
-			Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
-					info.get(TAG_APK_PATH));
-		}
-
-	}
 }

@@ -24,12 +24,6 @@ public class StreamConsumer extends Thread {
 		this.is = is;
 		this.output = new ArrayList<String>();
 	}
-	
-//	StreamConsumer(OutputStream os, String type){
-//		this.os = os;
-//		this.type = type;
-//		this.output = new ArrayList<String>();
-//	}
 
 	public void run() {
 		try {
