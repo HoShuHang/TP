@@ -20,16 +20,7 @@ import net.lingala.zip4j.exception.ZipException;
 
 public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 	private final String PYTHON = "python.exe";
-	private final String TAG_MOBILE = "mobile";
-	private final String TAG_WEAR = "wear";
-	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
-
-	// deprecated
-	public AndroidPythonUiautomatorExecutor(HashMap<String, List<Device>> deviceNumber) {
-		this.deviceNumber = deviceNumber;
-		this.mainTestRunner = null;
-	}
 
 	public AndroidPythonUiautomatorExecutor() {
 	}	
