@@ -13,12 +13,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import main.com.example.AndroidPythonUiautomatorExecutor.FileFilterWithType;
 import main.com.example.entity.Device;
 import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
+import main.com.example.utility.Utility;
 
-public class AndroidRobotframeworkExecutor implements TestExecutor{
+public class AndroidRobotframeworkExecutor implements TestExecutor {
 	private final String PYBOT = "pybot.bat";
+	private final String TAG_APK_PATH = "apk_path";
+	private final String TAG_APK_PACKAGE = "package";
+	private final String TAG_APK_LAUNCHABLE_ACTIVITY = "launchable-activity";
 	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
 	private String outputDirPath;
@@ -32,197 +37,106 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 	}
 
 	@Override
-	public void executeTest(TestData testData) {
-		
+	public void executeTest(TestData testData) throws IOException, InterruptedException {
+		HashMap<String, HashMap<String, String>> apkInfo = getApkInfo();
+
+		// findTestRunner();
+		for (Device phone : testData.getPhones()) {
+			turnOnBluetooth(phone);
+			installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
+			launchApp(phone, apkInfo);
+			for (Device wear : testData.getWearable()) {
+				clearWearGms(wear);
+				installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
+				List<Device> devices = new ArrayList<Device>();
+				devices.add(phone);
+				devices.add(wear);
+				preprocessBeforeExecuteTestScript(testData, devices);
+				execute(phone, wear);
+				uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
+			}
+			uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE));
+			turnOffBluetooth(phone);
+		}
 	}
 
 	public void setOutputDirPath(String path) {
 		this.outputDirPath = path;
 	}
 
-	public List<String> executeTest() throws IOException, InterruptedException {
-		List<String> output = new ArrayList<String>();
-		List<Device> lstPhone = deviceNumber.get(CoreOptions.TAG_MOBILE);
-		List<Device> lstWear = deviceNumber.get(CoreOptions.TAG_WEAR);
-
-		findTestRunner();
-		for (Device phone : lstPhone) {
-			turnOnBluetooth(phone);
-			for (Device wear : lstWear) {
-				clearWearGms(wear);
-			}
-
-			installApk(phone);
-			for (Device wear : lstWear) {
-				List<Device> devices = new ArrayList<Device>();
-				devices.add(phone);
-				devices.add(wear);
-				preprocessBeforeExecuteTestScript(devices);
-				launchApp(phone);
-				execute(phone, wear);
-			}
-			turnOffBluetooth(phone);
-		}
-		return output;
-	}
-
-	private void turnOffBluetooth(Device phone) throws IOException, InterruptedException {
-		System.out.println("【turnOffBluetooth】 " + phone.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\turnOffBluetooth.py");
-		command.add(phone.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-	}
-
-	private void turnOnBluetooth(Device phone) throws IOException, InterruptedException {
-		System.out.println("【turnOnBluetooth】 " + phone.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\turnOnBluetooth.py");
-		command.add(phone.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-	}
-
-	private void clearWearGms(Device wear) throws IOException, InterruptedException {
-		System.out.println("【clearWearGms】 " + wear.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\clearGms.py");
-		command.add(wear.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-	}
-
-	private void installApk(Device phone) throws IOException, InterruptedException {
-		System.out.println("【installApk】 " + phone.getSerialNum());
+	/* get file path, package and launchable-activity from apk */
+	private HashMap<String, HashMap<String, String>> getApkInfo() {
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
 		FileFilter filter = new FileFilterWithType("apk");
 		File[] files = folder.listFiles(filter);
-		// System.out.println("File size: " + files.length + " Device size: " +
-		// lstPhone.size());
-
-		for (File apk : files) {
-			List<String> command = new ArrayList<String>();
-			command.add(CoreOptions.ADB);
-			command.add("-s");
-			command.add(phone.getSerialNum());
-			command.add("install");
-			command.add(apk.getAbsolutePath());
-
-			ProcessBuilder proc = new ProcessBuilder(command);
-			Process p = proc.start();
-			StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-			StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-			stdinConsumer.start();
-			stderrConsumer.start();
-			p.waitFor();
+		HashMap<String, HashMap<String, String>> apkInfo = new HashMap<String, HashMap<String, String>>();
+		for (File file : files) {
+			String tagDevice = CoreOptions.TAG_WEAR;
+			HashMap<String, String> info = new HashMap<String, String>();
+			String packageName = getSpecValue(file, TAG_APK_PACKAGE);
+			String launchableActivity = getSpecValue(file, TAG_APK_LAUNCHABLE_ACTIVITY);
+			if (launchableActivity != null && !launchableActivity.isEmpty())
+				tagDevice = CoreOptions.TAG_MOBILE;
+			System.out.println("tag: " + tagDevice);
+			info.put(TAG_APK_PATH, file.getAbsolutePath());
+			info.put(TAG_APK_PACKAGE, packageName);
+			info.put(TAG_APK_LAUNCHABLE_ACTIVITY, launchableActivity);
+			apkInfo.put(tagDevice, info);
 		}
+		return apkInfo;
 
 	}
 
-	private void launchApp(Device phone) throws IOException, InterruptedException {
+	private String getSpecValue(File apk, String target) {
+		List<String> result = Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\ApkInfoGetter.py",
+				apk.getAbsolutePath(), target);
+		return result.get(0).replaceAll("\\r\\n", "");
+	}
+
+	private void installApk(Device phone, String apkPath) {
+		System.out.println("【installPhoneApk】");
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
+				apkPath);
+	}
+
+	private void installWearApk(Device phone, HashMap<String, HashMap<String, String>> apkInfo) {
+		System.out.println("【installWearApk】");
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
+				apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
+	}
+
+	private void uninstallApk(Device phone, String packageName) {
+		System.out.println("【uninstallWearApk】");
+//		String packageName = apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE);
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
+				packageName);
+	}
+
+	private void uninstallPhoneApk(Device phone, HashMap<String, HashMap<String, String>> apkInfo) {
+		System.out.println("【uninstallPhoneApk】");
+			String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE);
+				Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
+						packageName);
+	}
+
+	private void launchApp(Device phone, HashMap<String, HashMap<String, String>> apkInfo)
+			throws IOException, InterruptedException {
 		System.out.println("【launchApp】 ");
-		final String KEY_PACKAGE = "package";
-		final String KEY_LAUNCHABLE_ACTIVITY = "launchable-activity";
-		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
-		FileFilter filter = new FileFilterWithType("apk");
-		File[] files = folder.listFiles(filter);
-		System.out.println("apk number" + files.length);
-		for (File apkFile : files) {
-			List<String> dumpContent = dumpApk(apkFile);
-			HashMap<String, String> info = getPackageAndActivity(dumpContent);
-			String packageName = info.get(KEY_PACKAGE);
-			String mainActivity = info.get(KEY_LAUNCHABLE_ACTIVITY);
-			if (packageName != null && mainActivity != null || packageName != "" && mainActivity != "") {
-				launch(phone, packageName, mainActivity);
-			}
-		}
+		String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE);
+		String launchableActivity = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_LAUNCHABLE_ACTIVITY);
+		launch(phone, packageName, launchableActivity);
 	}
 
 	private void launch(Device phone, String packageName, String mainActivity)
 			throws IOException, InterruptedException {
-		ProcessBuilder proc = new ProcessBuilder(CoreOptions.ADB, "-s", phone.getSerialNum(), "shell", "am", "start",
-				"-W", "-n", packageName + "/" + mainActivity);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\launchApk.py", phone.getSerialNum(),
+				packageName + "/" + mainActivity);
 	}
 
-	private List<String> dumpApk(File apkFile) throws IOException, InterruptedException {
-		List<String> command = new ArrayList<String>();
-		command.add(CoreOptions.ANDROID_HOME + "\\build-tools\\22.0.1\\aapt.exe");
-		command.add("dump");
-		command.add("badging");
-		command.add(apkFile.getAbsolutePath());
-
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-		return stdinConsumer.getOutput();
-	}
-
-	private HashMap<String, String> getPackageAndActivity(List<String> content) {
-		HashMap<String, String> info = new HashMap<String, String>();
-		final String KEY_PACKAGE = "package";
-		final String KEY_LAUNCHABLE_ACTIVITY = "launchable-activity";
-		for (String line : content) {
-			if (line.contains(KEY_PACKAGE)) {
-				info.put(KEY_PACKAGE, getValue(line));
-				System.out.println(info.get(KEY_PACKAGE));
-			}
-			if (line.contains(KEY_LAUNCHABLE_ACTIVITY)) {
-				info.put(KEY_LAUNCHABLE_ACTIVITY, getValue(line));
-				System.out.println(info.get(KEY_LAUNCHABLE_ACTIVITY));
-			}
-		}
-		return info;
-	}
-
-	private String getValue(String line) {
-		final String NAME = "name";
-		String packageName = "";
-		String[] tokens = line.split(" ");
-		for (String token : tokens) {
-			if (token.contains(NAME)) {
-				int index = token.indexOf(NAME);
-				String sub = token.substring(index + NAME.length(), token.length());
-				packageName = sub.split("[=']")[2];
-			}
-		}
-		return packageName;
-	}
-
-	private void preprocessBeforeExecuteTestScript(List<Device> devices) throws IOException {
+	private void preprocessBeforeExecuteTestScript(TestData testData, List<Device> devices) throws IOException {
 		System.out.println("【preprocessBeforeExecuteTestScript】 ");
-		findTestRunner();
+		int index = testData.getProjectFullPath().length() - 4;
+		findTestRunner(testData.getProjectFullPath().substring(0, index));
 		List<String> content = readFile(mainTestRunner);
 		List<String> newContent = changeLibraryPath(content);
 		newContent = changeSerialNumber(newContent, devices);
@@ -231,31 +145,16 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
 		System.out.println("【execute】 ");
-		List<String> output = new ArrayList<String>();
-		Process p = null;
-		try {
-			List<String> command = new ArrayList<String>();
-			command.add(PYBOT);
-			command.add("--outputdir");
-			command.add(outputDirPath + "/" + phone.getSerialNum() + "_" + wear.getSerialNum());
-			command.add(mainTestRunner.getAbsolutePath());
+		List<String> output = Utility.cmd(PYBOT, "--outputdir",
+				outputDirPath + "/" + phone.getSerialNum() + "_" + wear.getSerialNum(),
+				mainTestRunner.getAbsolutePath());
 
-			ProcessBuilder proc = new ProcessBuilder(command);
-			p = proc.start();
-			StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-			StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-			stdinConsumer.start();
-			stderrConsumer.start();
-			p.waitFor();
-		} finally {
-			p.destroy();
-		}
 		return output;
 	}
 
-	private void findTestRunner() throws IOException {
+	private void findTestRunner(String directory) throws IOException {
 		System.out.println("【findTestRunner】");
-		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
+		File folder = new File(directory);
 		// System.out.println(folder.getPath());
 		FileFilter filter = new FileFilterWithType("txt");
 		File[] files = folder.listFiles(filter);
@@ -301,12 +200,21 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 	}
 
 	private String replaceMobilePyPath(String line) {
-		final String MOBILE_PY_PATH = "robotframework-uiautomatorlibrary-0.1/uiautomatorlibrary/Mobile.py";
-		int position = line.indexOf(MOBILE_PY_PATH);
-		String newLine = "";
-		newLine += line.substring(0, 18) + MOBILE_PY_PATH;
-		newLine += line.substring(position + MOBILE_PY_PATH.length(), line.length());
-		return newLine;
+		final String MOBILE_PY_PATH = "D:/Thesis/robotframework-uiautomatorlibrary-0.1/uiautomatorlibrary/Mobile.py";
+		final String IMPORT_INTERVAL_SPACE = "           ";
+		final String GENERAL_INTERVAL_SPACE = "    ";
+		StringBuffer sb = new StringBuffer();
+		String[] tokens = line.split("\\s+");
+		sb.append(tokens[0]);
+		sb.append(IMPORT_INTERVAL_SPACE);
+		sb.append(MOBILE_PY_PATH);
+		sb.append(GENERAL_INTERVAL_SPACE);
+		sb.append(tokens[2]);
+		sb.append(" ");
+		sb.append(tokens[3]);
+		sb.append(GENERAL_INTERVAL_SPACE);
+		sb.append(tokens[4]);
+		return sb.toString();
 	}
 
 	private List<String> changeSerialNumber(List<String> content, List<Device> devices) {
@@ -320,7 +228,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 			space += " ";
 
 		for (String line : content) {
-			System.out.println(line);
 			StringBuffer sb = new StringBuffer();
 			if (line.contains(KERWORD_SET_SERIAL) && !line.contains(KEYWORD_COMMENT)) {
 				String newLine = "";
@@ -334,7 +241,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 				}
 				newLine = sb.toString();
 				newContent.add(newLine);
-				// System.out.println(newLine);
 				continue;
 			}
 			newContent.add(line);
@@ -384,4 +290,20 @@ public class AndroidRobotframeworkExecutor implements TestExecutor{
 			}
 		}
 	}
+
+	private void turnOffBluetooth(Device phone) throws IOException, InterruptedException {
+		System.out.println("【turnOffBluetooth】 " + phone.getSerialNum());
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\turnOffBluetooth.py", phone.getSerialNum());
+	}
+
+	private void turnOnBluetooth(Device phone) throws IOException, InterruptedException {
+		System.out.println("【turnOnBluetooth】 " + phone.getSerialNum());
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\turnOnBluetooth.py", phone.getSerialNum());
+	}
+
+	private void clearWearGms(Device wear) throws IOException, InterruptedException {
+		System.out.println("【clearWearGms】 " + wear.getSerialNum());
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\clearGms.py", wear.getSerialNum());
+	}
+
 }

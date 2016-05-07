@@ -9,12 +9,10 @@ public class ExecutorOutputStream extends LogOutputStream {
 
 	List<String> output;
 	public ExecutorOutputStream() {
-		// TODO Auto-generated constructor stub
 		output = new ArrayList<String>();
 	}
 	@Override
 	protected void processLine(String line, int logLevel) {
-		// TODO Auto-generated method stub
 		output.add(line);
 		System.out.println(line);
 	}

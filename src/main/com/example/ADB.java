@@ -40,27 +40,16 @@ public class ADB {
 	}
 
 	public static List<String> getDeviceSerialNums() throws InterruptedException {
-		final int LIMIT = 50;
 		List<String> lstDevices = new ArrayList<String>();
 		List<String> lstResults = null;
-		String firstResultLine = "";
-		int count = 0;
-		do {
-			Utility.cmd(CoreOptions.ADB, "kill-server");
-			Utility.cmd(CoreOptions.ADB, "start-server");
-			lstResults = Utility.cmd(CoreOptions.ADB, "devices");
-			firstResultLine = lstResults.get(0);
-			System.out.println(firstResultLine);
-			count++;
-		} while (!firstResultLine.contains("List of devices attached") && count < LIMIT);
-		
-		System.out.println("here");
+		Utility.cmd(CoreOptions.ADB, "kill-server");
+		Utility.cmd(CoreOptions.ADB, "start-server");
+		lstResults = Utility.cmd(CoreOptions.ADB, "devices");
 		for (String line : lstResults) {
 			if (!line.contains("List of devices attached") && !line.isEmpty())
 				lstDevices.add(line.split("	")[0]);
 		}
 		return lstDevices;
-
 	}
 
 	private static List<String> getDeviceProp(String deviceSerialNum, String prop) {

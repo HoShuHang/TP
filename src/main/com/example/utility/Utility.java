@@ -6,21 +6,28 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.com.example.StreamConsumer;
+
 public class Utility {
 	public static List<String> cmd(String... command) {
-		List<String> lstResults = new ArrayList<String>();
 		ProcessBuilder proc = new ProcessBuilder(command);
+		StreamConsumer outputConsumer = null;
+		StreamConsumer errorConsumer = null;
+		Process p = null;
 		try {
-			Process p = proc.start();
-			BufferedReader results = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-			String line = "";
-			while ((line = results.readLine()) != null) {
-				lstResults.add(line);
-			}
+			p = proc.start();
+			outputConsumer = new StreamConsumer(p.getInputStream());
+			errorConsumer = new StreamConsumer(p.getErrorStream());
+			outputConsumer.start();
+			errorConsumer.start();
+			p.waitFor();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			p.destroy();
 		}
-		return lstResults;
+		return outputConsumer.getOutput();
 	}
 }

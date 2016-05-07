@@ -14,22 +14,16 @@ public class StreamConsumer extends Thread {
 	String type;
 	List<String> output;
 
-	StreamConsumer(InputStream is, String type) {
+	public StreamConsumer(InputStream is, String type) {
 		this.is = is;
 		this.type = type;
 		this.output = new ArrayList<String>();
 	}
 	
-	StreamConsumer(InputStream is){
+	public StreamConsumer(InputStream is){
 		this.is = is;
 		this.output = new ArrayList<String>();
 	}
-	
-//	StreamConsumer(OutputStream os, String type){
-//		this.os = os;
-//		this.type = type;
-//		this.output = new ArrayList<String>();
-//	}
 
 	public void run() {
 		try {
