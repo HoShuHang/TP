@@ -4,10 +4,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
-import org.easymock.EasyMockSupport;
-import org.easymock.internal.matchers.NotNull;
 import org.junit.Before;
 import org.junit.Test;
+
 
 import main.com.example.ADB;
 import main.com.example.entity.Device;
@@ -20,7 +19,6 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -136,7 +134,7 @@ public class PythonUiAutomatorServletTest {
 		devicesField.set(null, devices);
 		// mock part
 		String expectFileName = "script.zip";
-		InputStream expectInputStream = new ByteArrayInputStream(expectFileName.getBytes(StandardCharsets.UTF_8));;
+		InputStream expectInputStream = new ByteArrayInputStream(expectFileName.getBytes(StandardCharsets.UTF_8));
 		Part mockPart = new MyPart();
 		Field submittedFileNameField = MyPart.class.getDeclaredField("submittedFileName");
 		Field inputStreamField = MyPart.class.getDeclaredField("inputStream");
@@ -169,10 +167,5 @@ public class PythonUiAutomatorServletTest {
 		assertEquals(1, actualPhones.size());
 		assertTrue(actualWearable.isEmpty());
 		assertEquals(expectFileName, actualFileName);
-	}
-	
-	@Test
-	public void TestExecuteTest() {
-		
 	}
 }
