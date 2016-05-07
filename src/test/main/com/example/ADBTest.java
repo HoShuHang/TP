@@ -17,14 +17,15 @@ public class ADBTest {
 	private final String deviceSerialNum = "123456789";
 	private final String deviceModelAlias = "HSS model alias";
 	private final String deviceCharacteristic = "nosdcard";
-	
+
 	@Before
-	public void setUp(){
+	public void setUp() {
 		this.device = new Device(this.deviceSerialNum, this.deviceModelAlias, this.deviceCharacteristic);
 	}
-	
+
 	@Test
-	public void testGetDevicesWhenDevicesNotNull() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InterruptedException {
+	public void testGetDevicesWhenDevicesNotNull() throws NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException, InterruptedException {
 		List<Device> devices = new ArrayList<Device>();
 		devices.add(this.device);
 		Field devicesField;
@@ -32,5 +33,10 @@ public class ADBTest {
 		devicesField.setAccessible(true);
 		devicesField.set(null, devices);
 		assertTrue(ADB.getDevices().size() == 1);
+	}
+
+	@Test
+	public void testGetDeviceProp() {
+//		String deviceSerialNum = "123";
 	}
 }
