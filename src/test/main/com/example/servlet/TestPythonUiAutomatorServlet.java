@@ -38,7 +38,7 @@ public class TestPythonUiAutomatorServlet{
 	}
 	
 	@Test
-	public void testGetTOllWhenRequestRobotFramework() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+	public void testGetToolWhenRequestRobotFramework() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
 		expect(this.mockReq.getParameter("tool")).andReturn("robotframework");
 		replay(this.mockReq);
 		Class[] cArg = new Class[1];
