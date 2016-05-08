@@ -44,6 +44,11 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		for (Device phone : testData.getPhones()) {
 			turnOnBluetooth(phone);
 			installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
+			if(!isAppExists(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE))){
+				System.out.println("app not exists");
+				continue;
+			}
+			
 			launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
 				clearWearGms(wear);
@@ -77,7 +82,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			String launchableActivity = getSpecValue(file, TAG_APK_LAUNCHABLE_ACTIVITY);
 			if (launchableActivity != null && !launchableActivity.isEmpty())
 				tagDevice = CoreOptions.TAG_MOBILE;
-			System.out.println("tag: " + tagDevice);
 			info.put(TAG_APK_PATH, file.getAbsolutePath());
 			info.put(TAG_APK_PACKAGE, packageName);
 			info.put(TAG_APK_LAUNCHABLE_ACTIVITY, launchableActivity);
@@ -95,28 +99,19 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 
 	private void installApk(Device phone, String apkPath) {
 		System.out.println("【installPhoneApk】");
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
-				apkPath);
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(), apkPath);
 	}
 
-	private void installWearApk(Device phone, HashMap<String, HashMap<String, String>> apkInfo) {
-		System.out.println("【installWearApk】");
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(),
-				apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
+	private boolean isAppExists(Device device, String packageName) {
+		String result = Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\checkPackageExsits.py",
+				device.getSerialNum(), packageName).get(0).replaceAll("\\r\\n", "");
+		return result.equals("True");
 	}
 
 	private void uninstallApk(Device phone, String packageName) {
 		System.out.println("【uninstallWearApk】");
-//		String packageName = apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE);
 		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
 				packageName);
-	}
-
-	private void uninstallPhoneApk(Device phone, HashMap<String, HashMap<String, String>> apkInfo) {
-		System.out.println("【uninstallPhoneApk】");
-			String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE);
-				Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
-						packageName);
 	}
 
 	private void launchApp(Device phone, HashMap<String, HashMap<String, String>> apkInfo)
