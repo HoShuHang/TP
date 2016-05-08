@@ -6,12 +6,9 @@ import main.com.example.TestExecutor;
 
 public class ExecutorBuilder {
 	public TestExecutor build(Tool tool){
-		switch(tool){
-		case UIAutomator:
+		if(tool == Tool.UIAutomator)
 			return new AndroidPythonUiautomatorExecutor();
-		case RobotFramework:
+		else
 			return new AndroidRobotframeworkExecutor();
-		}
-		return null;
 	}
 }

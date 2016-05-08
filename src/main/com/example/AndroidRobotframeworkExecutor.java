@@ -42,7 +42,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 
 		// findTestRunner();
 		for (Device phone : testData.getPhones()) {
-			turnOnBluetooth(phone);
+			this.turnOnBluetooth(phone);
 			installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
 			if(!isAppExists(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE))){
 				System.out.println("app not exists");
@@ -51,7 +51,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			
 			launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
-				clearWearGms(wear);
+				this.clearWearGms(wear);
 				installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
 				List<Device> devices = new ArrayList<Device>();
 				devices.add(phone);
@@ -61,12 +61,8 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 				uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
 			}
 			uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE));
-			turnOffBluetooth(phone);
+			this.turnOffBluetooth(phone);
 		}
-	}
-
-	public void setOutputDirPath(String path) {
-		this.outputDirPath = path;
 	}
 
 	/* get file path, package and launchable-activity from apk */
@@ -285,20 +281,4 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			}
 		}
 	}
-
-	private void turnOffBluetooth(Device phone) throws IOException, InterruptedException {
-		System.out.println("【turnOffBluetooth】 " + phone.getSerialNum());
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\turnOffBluetooth.py", phone.getSerialNum());
-	}
-
-	private void turnOnBluetooth(Device phone) throws IOException, InterruptedException {
-		System.out.println("【turnOnBluetooth】 " + phone.getSerialNum());
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\turnOnBluetooth.py", phone.getSerialNum());
-	}
-
-	private void clearWearGms(Device wear) throws IOException, InterruptedException {
-		System.out.println("【clearWearGms】 " + wear.getSerialNum());
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\clearGms.py", wear.getSerialNum());
-	}
-
 }

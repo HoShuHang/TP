@@ -1,23 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.List"%>
-<%@ page import="main.com.example.ADB"%>
+<%@ page import="main.com.example.TestPlatform"%>
 <%@ page import="main.com.example.entity.Device"%>
 <%@ page import="java.util.ArrayList"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
-	List<Device> devices = ADB.getDevices();
-	List<Device> phones = new ArrayList<Device>();
-	List<Device> wearable = new ArrayList<Device>();
-	for (Device device : devices) {
-		if (device.isWearable()) {
-			wearable.add(device);
-		} else {
-			phones.add(device);
-		}
-	}
-	request.setAttribute("phones", phones);
-	request.setAttribute("wearable", wearable);
+	TestPlatform testPlatform = new TestPlatform();
+	request.setAttribute("phones", testPlatform.getPhones());
+	request.setAttribute("wearable", testPlatform.getWearable());
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>

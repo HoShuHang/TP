@@ -34,56 +34,8 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
 				report.addAll(this.execute(phone, wear));
 			}
-			turnOffBluetooth(phone);
+			this.turnOffBluetooth(phone);
 		}
-	}
-	
-	private void turnOffBluetooth(Device phone) throws IOException, InterruptedException {
-		System.out.println("【turnOffBluetooth】 " + phone.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\turnOffBluetooth.py");
-		command.add(phone.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-	}
-
-	private void turnOnBluetooth(Device phone) throws IOException, InterruptedException {
-		System.out.println("【turnOnBluetooth】 " + phone.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\turnOnBluetooth.py");
-		command.add(phone.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-	}
-
-	private void clearWearGms(Device wear) throws IOException, InterruptedException {
-		System.out.println("【clearWearGms】 " + wear.getSerialNum());
-		List<String> command = new ArrayList<String>();
-
-		command.add(CoreOptions.PYTHON);
-		command.add(CoreOptions.SCRIPT_DIR + "\\clearGms.py");
-		command.add(wear.getSerialNum());
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
 	}
 
 	private void installApk(Device phone) throws IOException, InterruptedException {
