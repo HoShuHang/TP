@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import main.com.example.StreamConsumer;
 
 public class Utility {
 	public static List<String> cmd(String... command) {
 		ProcessBuilder proc = new ProcessBuilder(command);
+		Map<String, String> env = proc.environment();
+		proc.environment().put("ANDROID_HOME", CoreOptions.ANDROID_HOME);
 		StreamConsumer outputConsumer = null;
 		StreamConsumer errorConsumer = null;
 		Process p = null;

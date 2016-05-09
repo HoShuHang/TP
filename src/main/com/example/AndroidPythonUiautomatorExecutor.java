@@ -11,18 +11,20 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import main.com.example.AndroidRobotframeworkExecutor.FileFilterWithType;
 import main.com.example.entity.Device;
 import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
+import main.com.example.utility.Utility;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 	private final String PYTHON = "python.exe";
 	private File mainTestRunner;
+	private DeviceController deviceController = null;
 
 	public AndroidPythonUiautomatorExecutor() {
+		this.deviceController = new DeviceController();
 	}	
 
 	@Override
@@ -34,7 +36,7 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
 				report.addAll(this.execute(phone, wear));
 			}
-			this.turnOffBluetooth(phone);
+			this.deviceController.turnOffBluetooth(phone);
 		}
 	}
 
@@ -97,7 +99,7 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 
 	private List<String> dumpApk(File apkFile) throws IOException, InterruptedException {
 		List<String> command = new ArrayList<String>();
-		command.add(CoreOptions.ANDROID_HOME + "\\build-tools\\22.0.1\\aapt.exe");
+		command.add(CoreOptions.AAPT);
 		command.add("dump");
 		command.add("badging");
 		command.add(apkFile.getAbsolutePath());
@@ -144,18 +146,22 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 	}
 
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
-		List<String> output = new ArrayList<String>();
-		ProcessBuilder proc = new ProcessBuilder(CoreOptions.PYTHON_HOME + File.separator + PYTHON,
-				mainTestRunner.getAbsolutePath(), phone.getSerialNum(), wear.getSerialNum());
 
+		List<String> output = Utility.cmd(CoreOptions.PYTHON, this.mainTestRunner.getAbsolutePath(), phone.getSerialNum(), wear.getSerialNum());
 		
-		Process p = proc.start();
-		StreamConsumer errorConsumer = new StreamConsumer(p.getErrorStream(), "error");
-
-		errorConsumer.start();
-
-		p.waitFor();
-		output = errorConsumer.getOutput();
+		//		List<String> output = new ArrayList<String>();
+//		ProcessBuilder proc = new ProcessBuilder(CoreOptions.PYTHON,
+//				mainTestRunner.getAbsolutePath(), phone.getSerialNum(), wear.getSerialNum());
+//
+//		
+//		Process p = proc.start();
+//		
+//		StreamConsumer errorConsumer = new StreamConsumer(p.getErrorStream(), "error");
+//
+//		errorConsumer.start();
+//
+//		p.waitFor();
+//		output = errorConsumer.getOutput();
 //		System.out.println("ExitVal: " + exitVal);
 
 		return output;

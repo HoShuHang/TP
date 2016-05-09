@@ -6,17 +6,16 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-import main.com.example.AndroidPythonUiautomatorExecutor.FileFilterWithType;
 import main.com.example.entity.Device;
 import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
+import main.com.example.utility.FileTypeFilter;
 import main.com.example.utility.Utility;
 
 public class AndroidRobotframeworkExecutor implements TestExecutor {
@@ -27,10 +26,12 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
 	private String outputDirPath;
+	private DeviceController deviceController = null;
 
 	public AndroidRobotframeworkExecutor(HashMap<String, List<Device>> deviceNumber) {
 		this.deviceNumber = deviceNumber;
 		this.mainTestRunner = null;
+		this.deviceController = new DeviceController();
 	}
 
 	public AndroidRobotframeworkExecutor() {
@@ -38,40 +39,41 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 
 	@Override
 	public void executeTest(TestData testData) throws IOException, InterruptedException {
-		HashMap<String, HashMap<String, String>> apkInfo = getApkInfo();
+		File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
+		HashMap<String, HashMap<String, String>> apkInfo = this.deviceController.getApkInfo(apkFiles);
 
 		// findTestRunner();
 		for (Device phone : testData.getPhones()) {
-			this.turnOnBluetooth(phone);
+			this.deviceController.turnOnBluetooth(phone);
 			installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
 			if(!isAppExists(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE))){
 				System.out.println("app not exists");
 				continue;
 			}
-			
+			this.deviceController.turnOnBluetooth(phone);
+			this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
+
 			launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
-				this.clearWearGms(wear);
-				installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
+				this.deviceController.clearWearGms(wear);
+				this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
 				List<Device> devices = new ArrayList<Device>();
 				devices.add(phone);
 				devices.add(wear);
 				preprocessBeforeExecuteTestScript(testData, devices);
 				execute(phone, wear);
-				uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
+				this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
 			}
-			uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE));
-			this.turnOffBluetooth(phone);
+			this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE));
+			this.deviceController.turnOffBluetooth(phone);
 		}
 	}
-
 	/* get file path, package and launchable-activity from apk */
 	private HashMap<String, HashMap<String, String>> getApkInfo() {
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
-		FileFilter filter = new FileFilterWithType("apk");
-		File[] files = folder.listFiles(filter);
+		File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
 		HashMap<String, HashMap<String, String>> apkInfo = new HashMap<String, HashMap<String, String>>();
-		for (File file : files) {
+		for (File file : apkFiles) {
 			String tagDevice = CoreOptions.TAG_WEAR;
 			HashMap<String, String> info = new HashMap<String, String>();
 			String packageName = getSpecValue(file, TAG_APK_PACKAGE);
@@ -139,7 +141,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		List<String> output = Utility.cmd(PYBOT, "--outputdir",
 				outputDirPath + "/" + phone.getSerialNum() + "_" + wear.getSerialNum(),
 				mainTestRunner.getAbsolutePath());
-
 		return output;
 	}
 
@@ -147,7 +148,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		System.out.println("【findTestRunner】");
 		File folder = new File(directory);
 		// System.out.println(folder.getPath());
-		FileFilter filter = new FileFilterWithType("txt");
+		FileFilter filter = new FileTypeFilter("txt");
 		File[] files = folder.listFiles(filter);
 		Arrays.sort(files, new FileSizeComparator());
 		for (File file : files) {
@@ -253,20 +254,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			e.printStackTrace();
 		}
 
-	}
-
-	class FileFilterWithType implements FileFilter {
-		String type;
-
-		public FileFilterWithType(String type) {
-			this.type = type;
-		}
-
-		@Override
-		public boolean accept(File pathname) {
-			String filename = pathname.getName();
-			return filename.endsWith(type);
-		}
 	}
 
 	class FileSizeComparator implements Comparator<File> {

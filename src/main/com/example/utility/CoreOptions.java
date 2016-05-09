@@ -12,5 +12,12 @@ public class CoreOptions {
 	public final static String TAG_WEAR = "wear";
 	public final static String TAG_PAIR_DEVICE = "pair_device";
 	public final static String LOG_PATH = "D:\\Thesis\\UploadSpace\\Log.txt";
-	public final static String SCRIPT_DIR = "D:\\Thesis\\Script";
+	public final static String SCRIPT_DIR = "D:\\Thesis\\Script";	
+	public final static String APK_INFO_GETTER_DIR = SCRIPT_DIR + "\\ApkInfoGetter.py";
+	public final static String TURN_OFF_BLUETOOTH_DIR = SCRIPT_DIR + "\\turnOffBluetooth.py";
+	public final static String TURN_ON_BLUETOOTH_DIR = SCRIPT_DIR + "\\turnOnBluetooth.py";
+	public final static String CLEAR_GMS_DIR = SCRIPT_DIR + "\\clearGms.py";
+	public final static String INSTALL_APK_DIR = SCRIPT_DIR + "\\installApk.py";
+	public final static String UNINSTALL_APK_DIR = SCRIPT_DIR + "\\uninstallApk.py";
+	public final static String AAPT = ANDROID_HOME + "\\build-tools\\22.0.0\\aapt";
 }
