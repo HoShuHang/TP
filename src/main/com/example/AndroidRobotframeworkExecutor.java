@@ -28,13 +28,14 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 	private String outputDirPath;
 	private DeviceController deviceController = null;
 
-	public AndroidRobotframeworkExecutor(HashMap<String, List<Device>> deviceNumber) {
-		this.deviceNumber = deviceNumber;
-		this.mainTestRunner = null;
-		this.deviceController = new DeviceController();
-	}
+//	public AndroidRobotframeworkExecutor(HashMap<String, List<Device>> deviceNumber) {
+//		this.deviceNumber = deviceNumber;
+//		this.mainTestRunner = null;
+//		this.deviceController = new DeviceController();
+//	}
 
 	public AndroidRobotframeworkExecutor() {
+		this.deviceController = new DeviceController();
 	}
 
 	@Override
@@ -42,14 +43,9 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
 		HashMap<String, HashMap<String, String>> apkInfo = this.deviceController.getApkInfo(apkFiles);
 
-		// findTestRunner();
+		int index = testData.getProjectFullPath().length() - 4;
+		findTestRunner(testData.getProjectFullPath().substring(0, index));
 		for (Device phone : testData.getPhones()) {
-			this.deviceController.turnOnBluetooth(phone);
-			installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
-			if(!isAppExists(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE))){
-				System.out.println("app not exists");
-				continue;
-			}
 			this.deviceController.turnOnBluetooth(phone);
 			this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
 
@@ -128,8 +124,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 
 	private void preprocessBeforeExecuteTestScript(TestData testData, List<Device> devices) throws IOException {
 		System.out.println("【preprocessBeforeExecuteTestScript】 ");
-		int index = testData.getProjectFullPath().length() - 4;
-		findTestRunner(testData.getProjectFullPath().substring(0, index));
 		List<String> content = readFile(mainTestRunner);
 		List<String> newContent = changeLibraryPath(content);
 		newContent = changeSerialNumber(newContent, devices);
