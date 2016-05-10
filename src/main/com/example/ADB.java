@@ -42,9 +42,9 @@ public class ADB {
 	public static List<String> getDeviceSerialNums() throws InterruptedException {
 		List<String> lstDevices = new ArrayList<String>();
 		List<String> lstResults = null;
-		Utility.cmd(CoreOptions.ADB, "kill-server");
-		Utility.cmd(CoreOptions.ADB, "start-server");
-		lstResults = Utility.cmd(CoreOptions.ADB, "devices");
+		Utility.cmd("getDeviceSerialNums", CoreOptions.ADB, "kill-server");
+		Utility.cmd("getDeviceSerialNums", CoreOptions.ADB, "start-server");
+		lstResults = Utility.cmd("getDeviceSerialNums", CoreOptions.ADB, "devices");
 		for (String line : lstResults) {
 			if (!line.contains("List of devices attached") && !line.isEmpty())
 				lstDevices.add(line.split("	")[0]);
@@ -53,6 +53,6 @@ public class ADB {
 	}
 
 	private static List<String> getDeviceProp(String deviceSerialNum, String prop) {
-		return Utility.cmd(CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", prop);
+		return Utility.cmd("getDeviceProp", CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", prop);
 	}
 }

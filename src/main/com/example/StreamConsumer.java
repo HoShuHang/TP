@@ -11,12 +11,12 @@ import java.util.List;
 public class StreamConsumer extends Thread {
 	InputStream is;
 //	OutputStream os;
-	String type;
+	String action;
 	List<String> output;
 
-	public StreamConsumer(InputStream is, String type) {
+	public StreamConsumer(InputStream is, String action) {
 		this.is = is;
-		this.type = type;
+		this.action = action;
 		this.output = new ArrayList<String>();
 	}
 	
@@ -32,7 +32,7 @@ public class StreamConsumer extends Thread {
 			String line = null;
 			while ((line = br.readLine()) != null){
 				output.add(line);
-				System.out.println(line);
+				System.out.println("【" + action + "】"+line);
 			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();

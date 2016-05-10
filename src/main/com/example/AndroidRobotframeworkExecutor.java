@@ -28,12 +28,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 	private String outputDirPath;
 	private DeviceController deviceController = null;
 
-//	public AndroidRobotframeworkExecutor(HashMap<String, List<Device>> deviceNumber) {
-//		this.deviceNumber = deviceNumber;
-//		this.mainTestRunner = null;
-//		this.deviceController = new DeviceController();
-//	}
-
 	public AndroidRobotframeworkExecutor() {
 		this.deviceController = new DeviceController();
 	}
@@ -51,61 +45,28 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 
 			launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
+				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum()
+						+ "-------------------");
 				this.deviceController.clearWearGms(wear);
 				this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
-				List<Device> devices = new ArrayList<Device>();
-				devices.add(phone);
-				devices.add(wear);
-				preprocessBeforeExecuteTestScript(testData, devices);
-				execute(phone, wear);
+				List<String> result = this.deviceController.waitWearInstallApp(wear,
+						apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
+				if (Utility.isContain(result, "Timeout")) {
+					report.add("The app doesn't sync to watch.");
+					continue;
+				} else {
+					List<Device> devices = new ArrayList<Device>();
+					devices.add(phone);
+					devices.add(wear);
+					preprocessBeforeExecuteTestScript(testData, devices);
+					report.addAll(execute(phone, wear));
+				}
+				this.deviceController.uninstallApk(wear, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
 				this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
 			}
 			this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE));
 			this.deviceController.turnOffBluetooth(phone);
 		}
-	}
-	/* get file path, package and launchable-activity from apk */
-	private HashMap<String, HashMap<String, String>> getApkInfo() {
-		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
-		File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
-		HashMap<String, HashMap<String, String>> apkInfo = new HashMap<String, HashMap<String, String>>();
-		for (File file : apkFiles) {
-			String tagDevice = CoreOptions.TAG_WEAR;
-			HashMap<String, String> info = new HashMap<String, String>();
-			String packageName = getSpecValue(file, TAG_APK_PACKAGE);
-			String launchableActivity = getSpecValue(file, TAG_APK_LAUNCHABLE_ACTIVITY);
-			if (launchableActivity != null && !launchableActivity.isEmpty())
-				tagDevice = CoreOptions.TAG_MOBILE;
-			info.put(TAG_APK_PATH, file.getAbsolutePath());
-			info.put(TAG_APK_PACKAGE, packageName);
-			info.put(TAG_APK_LAUNCHABLE_ACTIVITY, launchableActivity);
-			apkInfo.put(tagDevice, info);
-		}
-		return apkInfo;
-
-	}
-
-	private String getSpecValue(File apk, String target) {
-		List<String> result = Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\ApkInfoGetter.py",
-				apk.getAbsolutePath(), target);
-		return result.get(0).replaceAll("\\r\\n", "");
-	}
-
-	private void installApk(Device phone, String apkPath) {
-		System.out.println("【installPhoneApk】");
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\installApk.py", phone.getSerialNum(), apkPath);
-	}
-
-	private boolean isAppExists(Device device, String packageName) {
-		String result = Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\checkPackageExsits.py",
-				device.getSerialNum(), packageName).get(0).replaceAll("\\r\\n", "");
-		return result.equals("True");
-	}
-
-	private void uninstallApk(Device phone, String packageName) {
-		System.out.println("【uninstallWearApk】");
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
-				packageName);
 	}
 
 	private void launchApp(Device phone, HashMap<String, HashMap<String, String>> apkInfo)
@@ -118,7 +79,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 
 	private void launch(Device phone, String packageName, String mainActivity)
 			throws IOException, InterruptedException {
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\launchApk.py", phone.getSerialNum(),
+		Utility.cmd("launch", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\launchApk.py", phone.getSerialNum(),
 				packageName + "/" + mainActivity);
 	}
 
@@ -132,7 +93,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
 		System.out.println("【execute】 ");
-		List<String> output = Utility.cmd(PYBOT, "--outputdir",
+		List<String> output = Utility.cmd("execute", PYBOT, "--outputdir",
 				outputDirPath + "/" + phone.getSerialNum() + "_" + wear.getSerialNum(),
 				mainTestRunner.getAbsolutePath());
 		return output;
@@ -141,7 +102,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 	private void findTestRunner(String directory) throws IOException {
 		System.out.println("【findTestRunner】");
 		File folder = new File(directory);
-		// System.out.println(folder.getPath());
 		FileFilter filter = new FileTypeFilter("txt");
 		File[] files = folder.listFiles(filter);
 		Arrays.sort(files, new FileSizeComparator());
@@ -154,21 +114,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 				}
 			}
 		}
-	}
-
-	private List<String> readFile(File file) throws IOException {
-		List<String> content = new ArrayList<String>();
-		if (file.exists()) {
-			FileReader fr = new FileReader(file);
-			BufferedReader br = new BufferedReader(fr);
-			String line = "";
-			while ((line = br.readLine()) != null) {
-				content.add(line);
-			}
-		} else {
-			System.out.println("no file");
-		}
-		return content;
 	}
 
 	private List<String> changeLibraryPath(List<String> content) {
@@ -234,7 +179,22 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		return newContent;
 	}
 
-	private void writeFile(File file, List<String> content) {
+	public static List<String> readFile(File file) throws IOException {
+		List<String> content = new ArrayList<String>();
+		if (file.exists()) {
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			String line = "";
+			while ((line = br.readLine()) != null) {
+				content.add(line);
+			}
+		} else {
+			System.out.println("no file");
+		}
+		return content;
+	}
+
+	public static void writeFile(File file, List<String> content) {
 		FileWriter fw;
 		try {
 			fw = new FileWriter(file);
@@ -247,7 +207,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	class FileSizeComparator implements Comparator<File> {

@@ -55,7 +55,7 @@ public class StreamConsumerTest {
 		String type = "type";
 		StreamConsumer streamConsumer = new StreamConsumer(this.inputStream, type);
 		Field isField = StreamConsumer.class.getDeclaredField("is");
-		Field typeField = StreamConsumer.class.getDeclaredField("type");
+		Field typeField = StreamConsumer.class.getDeclaredField("action");
 		isField.setAccessible(true);
 		typeField.setAccessible(true);
 		InputStream actualInputStream = (InputStream) isField.get(streamConsumer);
