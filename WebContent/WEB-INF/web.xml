@@ -18,11 +18,11 @@
 		<url-pattern>/execute</url-pattern>
 	</servlet-mapping>
 	<servlet>
-		<servlet-name>RobotframeworkServlet</servlet-name>
-		<servlet-class>main.com.example.servlet.RobotframeworkServlet</servlet-class>
+		<servlet-name>StartTestServlet</servlet-name>
+		<servlet-class>main.com.example.servlet.StartTestServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>RobotframeworkServlet</servlet-name>
-		<url-pattern>/RobotframeworkServlet</url-pattern>
+		<servlet-name>StartTestServlet</servlet-name>
+		<url-pattern>/device</url-pattern>
 	</servlet-mapping>
 </web-app>
