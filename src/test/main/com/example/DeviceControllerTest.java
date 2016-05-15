@@ -37,41 +37,4 @@ public class DeviceControllerTest {
 //		String actual = (String) method.invoke(this.deviceController, file, TAG_APK_PACKAGE);
 //		assertFalse(actual.contains("\\r\\n"));
 	}
-
-	@Test
-	public void testTurnOffBluetooth() throws IOException, InterruptedException {
-		File file = new File(CoreOptions.TURN_OFF_BLUETOOTH_DIR);
-		assertTrue(file.exists());
-//		this.deviceController.turnOffBluetooth(new Device("123456789", "htc", "nosdcard"));
-	}
-
-	@Test
-	public void testTurnOnBluetooth() throws IOException, InterruptedException {
-		File file = new File(CoreOptions.TURN_ON_BLUETOOTH_DIR);
-		assertTrue(file.exists());
-//		this.deviceController.turnOnBluetooth(new Device("HT53VWZ01028", "htc", "nosdcard"));
-	}
-
-	@Test
-	public void testClearWearGms() throws IOException, InterruptedException {
-		File file = new File(CoreOptions.CLEAR_GMS_DIR);
-		assertTrue(file.exists());
-		// this.deviceController.clearWearGms(new Device("123456789", "htc",
-		// "nosdcard, watch"));
-	}
-
-	@Test
-	public void testInstallApk() throws IOException, InterruptedException {
-		File file = new File(CoreOptions.INSTALL_APK_DIR);
-		assertTrue(file.exists());
-		// this.deviceController.installApk(new Device("123456789", "htc",
-		// "nosdcard, watch"), CoreOptions.UPLOAD_DIRECTORY + "/test.apk");
-	}
-
-	@Test
-	public void testUninstallApk() {
-		File file = new File(CoreOptions.UNINSTALL_APK_DIR);
-		assertTrue(file.exists());
-//		this.deviceController.uninstallApk(new Device("123456789", "htc", "nosdcard"), "test package");
-	}
 }

@@ -34,17 +34,17 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 		File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
 		HashMap<String, HashMap<String, String>> apkInfo = this.deviceController.getApkInfo(apkFiles);
 		for (Device phone : testData.getPhones()) {
-			this.deviceController.turnOnBluetooth(phone);
+			phone.turnOnBluetooth();
 //			this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
 //			this.deviceController.launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
-				this.deviceController.clearWearGms(wear);
+				wear.clearWearGms();
 //				this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
 				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
 				report.addAll(this.execute(phone, wear));
 //				this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 			}
-			this.deviceController.turnOffBluetooth(phone);
+			phone.turnOffBluetooth();
 		}
 	}
 

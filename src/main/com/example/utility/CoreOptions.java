@@ -23,4 +23,5 @@ public class CoreOptions {
 	public final static String TAG_APK_PATH = "apk_path";
 	public final static String TAG_APK_PACKAGE = "package";
 	public final static String LAUNCH_APK_DIR = SCRIPT_DIR + "/launchApk.py";
+	public final static String TAG_APK_LAUNCHABLE_ACTIVITY = "launchable-activity";
 }

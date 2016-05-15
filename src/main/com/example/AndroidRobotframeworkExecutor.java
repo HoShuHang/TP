@@ -38,16 +38,15 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		int index = testData.getProjectFullPath().length() - 4;
 		findTestRunner(testData.getProjectFullPath().substring(0, index));
 		for (Device phone : testData.getPhones()) {
-			this.deviceController.turnOnBluetooth(phone);
-			this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
-			this.deviceController.launchApp(phone, apkInfo);
+			phone.turnOnBluetooth();
+			phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
+			phone.launchApp(apkInfo);
 			for (Device wear : testData.getWearable()) {
 				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum()
 						+ "-------------------");
-				this.deviceController.clearWearGms(wear);
-				this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-				List<String> result = this.deviceController.waitWearInstallApp(wear,
-						apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				wear.clearWearGms();
+				phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
+				List<String> result = wear.waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 				if (Utility.isContain(result, "Timeout")) {
 					report.add("The app doesn't sync to watch.");
 					continue;
@@ -58,11 +57,11 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 					preprocessBeforeExecuteTestScript(testData, devices);
 					report.addAll(execute(phone, wear));
 				}
-				this.deviceController.uninstallApk(wear, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-				this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				wear.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 			}
-			this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
-			this.deviceController.turnOffBluetooth(phone);
+			phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
+			phone.turnOffBluetooth();
 		}
 	}
 
