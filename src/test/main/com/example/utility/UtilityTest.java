@@ -18,7 +18,7 @@ public class UtilityTest {
 	
 	@Test
 	public void testCmd() {
-		List<String> result = Utility.cmd(CoreOptions.ADB, "devices");
+		List<String> result = Utility.cmd("testCmd",CoreOptions.ADB, "devices");
 		assertTrue(result.get(0).equals("List of devices attached"));
 	}
 	

@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.annotation.MultipartConfig;
@@ -33,28 +34,28 @@ import main.com.example.entity.Tool;
 import main.com.example.utility.CoreOptions;
 import net.lingala.zip4j.exception.ZipException;
 
-@WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/execute" }, asyncSupported=true)
+@WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/execute" }, asyncSupported = true)
 @MultipartConfig
 public class PythonUiAutomatorServlet extends HttpServlet {
-	final String HTML_NAME_TESTSCRIPT = "testscript";
-	final String HTML_NAME_MOBILE_SERIAL_NUMBER = "mobile_serial_number";
-	final String HTML_NAME_WEAR_SERIAL_NUMBER = "wear_serial_number";
+//	final String HTML_NAME_TESTSCRIPT = "testscript";
+//	final String HTML_NAME_MOBILE_SERIAL_NUMBER = "mobile_serial_number";
+//	final String HTML_NAME_WEAR_SERIAL_NUMBER = "wear_serial_number";
 	final String TAG_REPORT = "report";
 	final String TAG_REPORT_SIZE = TAG_REPORT + "_size";
-	final String TAG_MOBILE = "mobile";
-	final String TAG_WEAR = "wear";
-	final String SETTING_PY = "Setting.py";
-	final String[] POST_PARAMS = { HTML_NAME_TESTSCRIPT, "apk" };
+//	final String TAG_MOBILE = "mobile";
+//	final String TAG_WEAR = "wear";
+//	final String SETTING_PY = "Setting.py";
+//	final String[] POST_PARAMS = { HTML_NAME_TESTSCRIPT, "apk" };
 
 	private Lock lock = new ReentrantLock();
 	private LinkedList<AsyncContext> asyncContexts = new LinkedList<>();
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//		Runnable runnable = new ExecuteRunnable(req);
-//		java.util.concurrent.Executor executor = new MyExecutor();
-//		executor.execute(runnable);
+		// Runnable runnable = new ExecuteRunnable(req);
+		// java.util.concurrent.Executor executor = new MyExecutor();
+		// executor.execute(runnable);
 		System.out.println("doPost");
-		
+
 		TestData testData = null;
 		try {
 			testData = this.parseTestData(req);
@@ -69,17 +70,18 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		} catch (InterruptedException | ZipException e) {
 			e.printStackTrace();
 		}
-		
-		req.setAttribute(TAG_REPORT_SIZE, output.size());
-		 int lineCnt = 1;
-		 for (String line : output) {
-		 req.setAttribute(TAG_REPORT + "_" + lineCnt++, line);
-		 }
-		 // go to "report.jsp"
-		 req.getRequestDispatcher("report.jsp").forward(req, resp);
+		ServletContext application = this.getServletContext();
+		application.setAttribute(TAG_REPORT_SIZE, output.size());
+		int lineCnt = 1;
+		for (String line : output) {
+			application.setAttribute(TAG_REPORT + "_" + lineCnt++, line);
+		}
+		// go to "report.jsp"
+		resp.sendRedirect("report.jsp");
 	}
 
-	private TestData parseTestData(HttpServletRequest req) throws ServletException, IOException, ZipException, InterruptedException {
+	private TestData parseTestData(HttpServletRequest req)
+			throws ServletException, IOException, ZipException, InterruptedException {
 		final String HTML_NAME_TESTSCRIPT = "testscript";
 		TestData testData = new TestData();
 		Part filePart = req.getPart(HTML_NAME_TESTSCRIPT);
@@ -107,8 +109,9 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		else
 			return Tool.RobotFramework;
 	}
-	
-	private List<String> executeTest(TestExecutor executor, TestData testData) throws IOException, InterruptedException, ZipException {
+
+	private List<String> executeTest(TestExecutor executor, TestData testData)
+			throws IOException, InterruptedException, ZipException {
 		executor.execute(testData);
 		return executor.getTestReport();
 	}

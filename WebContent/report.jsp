@@ -15,7 +15,7 @@
 </head>
 <body>
 	<%
-		Integer line_size = (Integer) request.getAttribute(TAG_REPORT_SIZE);
+		Integer line_size = (Integer) application.getAttribute(TAG_REPORT_SIZE);
 
 		for (int i = 1; i <= line_size; i++) {
 	%>
