@@ -3,19 +3,14 @@ package main.com.example.servlet;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import main.com.example.TestExecutor;
 import main.com.example.TestPlatform;
 import main.com.example.entity.Device;
-import main.com.example.entity.ExecutorBuilder;
-import main.com.example.entity.TestData;
-import net.lingala.zip4j.exception.ZipException;
 
 @WebServlet(name = "StartTestServlet", urlPatterns = { "/device" })
 public class StartTestServlet extends HttpServlet{
