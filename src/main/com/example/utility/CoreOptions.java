@@ -20,4 +20,7 @@ public class CoreOptions {
 	public final static String INSTALL_APK_DIR = SCRIPT_DIR + "\\installApk.py";
 	public final static String UNINSTALL_APK_DIR = SCRIPT_DIR + "\\uninstallApk.py";
 	public final static String AAPT = ANDROID_HOME + "\\build-tools\\22.0.0\\aapt";
+	public final static String TAG_APK_PATH = "apk_path";
+	public final static String TAG_APK_PACKAGE = "package";
+	public final static String LAUNCH_APK_DIR = SCRIPT_DIR + "/launchApk.py";
 }

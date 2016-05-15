@@ -22,7 +22,7 @@ public class DeviceController {
 		for (File file : apkFiles) {
 			String tagDevice = CoreOptions.TAG_WEAR;
 			HashMap<String, String> info = new HashMap<String, String>();
-			String packageName = this.getSpecValue(file, TAG_APK_PACKAGE);
+			String packageName = this.getSpecValue(file, CoreOptions.TAG_APK_PACKAGE);
 			String launchableActivity = this.getSpecValue(file, TAG_APK_LAUNCHABLE_ACTIVITY);
 			if (launchableActivity != null && !launchableActivity.isEmpty())
 				tagDevice = CoreOptions.TAG_MOBILE;
@@ -65,7 +65,21 @@ public class DeviceController {
 
 	public void uninstallApk(Device phone, String packageName) {
 		System.out.println("【uninstallWearApk】");
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\uninstallApk.py", phone.getSerialNum(),
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.UNINSTALL_APK_DIR, phone.getSerialNum(),
 				packageName);
+	}
+
+	public void launchApp(Device phone, HashMap<String, HashMap<String, String>> apkInfo)
+			throws IOException, InterruptedException {
+		System.out.println("【launchApp】 ");
+		String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE);
+		String launchableActivity = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_LAUNCHABLE_ACTIVITY);
+		launch(phone, packageName, launchableActivity);
+	}
+
+	private void launch(Device phone, String packageName, String mainActivity)
+			throws IOException, InterruptedException {
+		Utility.cmd(CoreOptions.PYTHON, CoreOptions.LAUNCH_APK_DIR, phone.getSerialNum(),
+				packageName + "/" + mainActivity);
 	}
 }

@@ -21,4 +21,10 @@ public class UtilityTest {
 		List<String> result = Utility.cmd(CoreOptions.ADB, "devices");
 		assertTrue(result.get(0).equals("List of devices attached"));
 	}
+	
+//	@Test
+//	public void testTest() {
+//		Utility.cmd("python", "/Users/kevinho/project/TPUploadSpace/main/RunTest.py", "FA369W910377", "510KPNY0322975");
+//		//		Utility.cmd("python", "/Users/kevinho/project/TPUploadSpace/main/RunTest.py", "FA369W910377", "510KPNY0322975");
+//	}
 }

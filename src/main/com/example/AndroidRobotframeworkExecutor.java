@@ -20,8 +20,6 @@ import main.com.example.utility.Utility;
 
 public class AndroidRobotframeworkExecutor implements TestExecutor {
 	private final String PYBOT = "pybot.bat";
-	private final String TAG_APK_PATH = "apk_path";
-	private final String TAG_APK_PACKAGE = "package";
 	private final String TAG_APK_LAUNCHABLE_ACTIVITY = "launchable-activity";
 	private HashMap<String, List<Device>> deviceNumber;
 	private File mainTestRunner;
@@ -45,35 +43,21 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		// findTestRunner();
 		for (Device phone : testData.getPhones()) {
 			this.deviceController.turnOnBluetooth(phone);
-			this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PATH));
-			launchApp(phone, apkInfo);
+			this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
+			this.deviceController.launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
 				this.deviceController.clearWearGms(wear);
-				this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PATH));
+				this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
 				List<Device> devices = new ArrayList<Device>();
 				devices.add(phone);
 				devices.add(wear);
 				preprocessBeforeExecuteTestScript(testData, devices);
-				execute(phone, wear);
-				this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(TAG_APK_PACKAGE));
+				this.execute(phone, wear);
+				this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 			}
-			this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE));
+			this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
 			this.deviceController.turnOffBluetooth(phone);
 		}
-	}
-
-	private void launchApp(Device phone, HashMap<String, HashMap<String, String>> apkInfo)
-			throws IOException, InterruptedException {
-		System.out.println("【launchApp】 ");
-		String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_PACKAGE);
-		String launchableActivity = apkInfo.get(CoreOptions.TAG_MOBILE).get(TAG_APK_LAUNCHABLE_ACTIVITY);
-		launch(phone, packageName, launchableActivity);
-	}
-
-	private void launch(Device phone, String packageName, String mainActivity)
-			throws IOException, InterruptedException {
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\launchApk.py", phone.getSerialNum(),
-				packageName + "/" + mainActivity);
 	}
 
 	private void preprocessBeforeExecuteTestScript(TestData testData, List<Device> devices) throws IOException {
