@@ -49,6 +49,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 				List<String> result = wear.waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 				if (Utility.isContain(result, "Timeout")) {
 					report.add("The app doesn't sync to watch.");
+					phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 					continue;
 				} else {
 					List<Device> devices = new ArrayList<Device>();
