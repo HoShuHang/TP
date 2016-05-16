@@ -40,13 +40,15 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		for (Device phone : testData.getPhones()) {
 			phone.turnOnBluetooth();
 			phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
-			phone.launchApp(apkInfo);
+			phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
+					apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
 			for (Device wear : testData.getWearable()) {
 				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum()
 						+ "-------------------");
 				wear.clearWearGms();
 				phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-				List<String> result = wear.waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				List<String> result = wear
+						.waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 				if (Utility.isContain(result, "Timeout")) {
 					report.add("The app doesn't sync to watch.");
 					phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));

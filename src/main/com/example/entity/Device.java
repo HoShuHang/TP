@@ -60,16 +60,9 @@ public class Device {
 				packageName);
 	}
 
-	public void launchApp(HashMap<String, HashMap<String, String>> apkInfo)
+	public void launchApp(String packageName, String mainActivity)
 			throws IOException, InterruptedException {
-		System.out.println("【launchApp】 ");
-		String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE);
-		String launchableActivity = apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY);
-		launch(packageName, launchableActivity);
-	}
-
-	private void launch(String packageName, String mainActivity)
-			throws IOException, InterruptedException {
+		System.out.println("【launchApp】");
 		Utility.cmd("launch", CoreOptions.PYTHON, CoreOptions.LAUNCH_APK_DIR, this.getSerialNum(),
 				packageName + "/" + mainActivity);
 	}
