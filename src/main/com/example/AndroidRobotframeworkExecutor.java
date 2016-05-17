@@ -40,12 +40,13 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		for (Device phone : testData.getPhones()) {
 			phone.turnOnBluetooth();
 			phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
-			phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
-					apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
 			for (Device wear : testData.getWearable()) {
 				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum()
 						+ "-------------------");
 				wear.clearWearGms();
+				wear.makeWearVisible();
+				phone.launchApp(CoreOptions.COMPANION_PACHAKGE, CoreOptions.COMPANION_LAUNCHABLE_ACTIVITY);
+				phone.pair(wear);
 				phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
 				List<String> result = wear
 						.waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
@@ -58,6 +59,8 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 					devices.add(phone);
 					devices.add(wear);
 					preprocessBeforeExecuteTestScript(testData, devices);
+					phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
+							apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
 					report.addAll(execute(phone, wear));
 				}
 				wear.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
@@ -65,6 +68,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			}
 			phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
 			phone.turnOffBluetooth();
+			phone.forgetWatch();
 		}
 	}
 

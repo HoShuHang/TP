@@ -69,8 +69,25 @@ public class Device {
 
 	public List<String> waitWearInstallApp(String packageName) {
 		System.out.println("【waitWearInstallApp】");
-		System.out.println("【waitWearInstallApp】package: " + packageName);
 		return Utility.cmd("waitWearInstallApp", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\waitWearAppInstall.py",
 				this.getSerialNum(), packageName);
+	}
+	
+	public void makeWearVisible(){
+		System.out.println("【makeWearVisible】");
+		Utility.cmd("makeWearVisible", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\makeWearVisible.py",
+				this.getSerialNum());
+	}
+	
+	public void pair(Device wear){
+		System.out.println("【pair】");
+		Utility.cmd("pair", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\pair.py",
+				this.getSerialNum(), wear.getSerialNum());
+	}
+	
+	public void forgetWatch(){
+		System.out.println("【forgetWatch】");
+		Utility.cmd("forgetWatch", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\forgetWatch.py",
+				this.getSerialNum());
 	}
 }
