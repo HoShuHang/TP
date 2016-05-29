@@ -58,7 +58,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		TestPlatform testPlatform = (TestPlatform) this.getServletContext().getAttribute("testPlatform");
-		List<String> output = testPlatform.execute(testData);
+		List<HashMap<String, Object>> output = testPlatform.execute(testData);
 		ServletContext application = this.getServletContext();
 //		application.setAttribute(TAG_REPORT_SIZE, output.size());
 //		int lineCnt = 1;
