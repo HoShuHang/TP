@@ -6,8 +6,10 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -38,32 +40,96 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		int index = testData.getProjectFullPath().length() - 4;
 		findTestRunner(testData.getProjectFullPath().substring(0, index));
 		for (Device phone : testData.getPhones()) {
-			phone.turnOnBluetooth();
-			phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
-			phone.launchApp(apkInfo);
 			for (Device wear : testData.getWearable()) {
-				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum()
-						+ "-------------------");
-				wear.clearWearGms();
+				HashMap<String, Object> report = new HashMap<String, Object>();
+				report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
+				report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());
+				// report.add("-------------------Mobile: " +
+				// phone.getSerialNum() + ",Wearable: " + wear.getSerialNum()
+				// + "-------------------");
+				// phone.turnOnBluetooth();
+				// wear.clearWearGms();
+				// wear.makeWearVisible();
+				// phone.launchApp(CoreOptions.COMPANION_PACHAKGE,
+				// CoreOptions.COMPANION_LAUNCHABLE_ACTIVITY);
+				// phone.pair(wear);
+				//
+				phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
+
 				phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-				List<String> result = wear.waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-				if (Utility.isContain(result, "Timeout")) {
-					report.add("The app doesn't sync to watch.");
-					phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-					continue;
-				} else {
-					List<Device> devices = new ArrayList<Device>();
-					devices.add(phone);
-					devices.add(wear);
-					preprocessBeforeExecuteTestScript(testData, devices);
-					report.addAll(execute(phone, wear));
-				}
-				wear.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-				phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				// List<String> result = wear
+				// .waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				// if (Utility.isContain(result, "Timeout")) {
+				// List<String> reportContent = new ArrayList<String>();
+				// reportContent.add("The app doesn't sync to watch.");
+				// report.put(CoreOptions.TAG_REPORT, reportContent);
+				// //// report.add("The app doesn't sync to watch.");
+				// } else {
+				List<Device> devices = new ArrayList<Device>();
+				devices.add(phone);
+				devices.add(wear);
+				preprocessBeforeExecuteTestScript(testData, devices);
+				phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
+						apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
+				report.put(CoreOptions.TAG_REPORT, execute(phone, wear));
+				// report.addAll(execute(phone, wear));
+				// }
+				//
+				// wear.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				//
+				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				//
+				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
+				// phone.turnOffBluetooth();
+				// phone.forgetWatch();
+				lstReport.add(report);
 			}
-			phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
-			phone.turnOffBluetooth();
 		}
+	}
+
+	// private void scriptOnly(TestData testData) throws IOException,
+	// InterruptedException {
+	// File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
+	// HashMap<String, HashMap<String, String>> apkInfo =
+	// this.deviceController.getApkInfo(apkFiles);
+	// for (Device phone : testData.getPhones()) {
+	// for (Device wear : testData.getWearable()) {
+	// report.add("-------------------Mobile: " + phone.getSerialNum() + ",
+	// Wearable: " + wear.getSerialNum());
+	// report.addAll(execute(phone, wear));
+	// }
+	// }
+	// }
+
+	// private void installTest(TestData testData) throws IOException,
+	// InterruptedException {
+	// File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
+	// HashMap<String, HashMap<String, String>> apkInfo =
+	// this.deviceController.getApkInfo(apkFiles);
+	// for (Device phone : testData.getPhones()) {
+	// phone.turnOnBluetooth();
+	// for (Device wear : testData.getWearable()) {
+	// wear.clearWearGms();
+	// phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
+	// List<String> result = wear
+	// .waitWearInstallApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
+	// boolean isContain = isContainSuccess(result);
+	// report.add(String.valueOf(isContain));
+	// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
+	// }
+	// phone.turnOffBluetooth();
+	// }
+	// report.add(
+	// "Time of finish:" + new
+	// SimpleDateFormat("yyyyMMdd_HH:mm:ss").format(Calendar.getInstance().getTime()));
+	// }
+
+	private boolean isContainSuccess(List<String> content) {
+		for (String line : content) {
+			if (line.contains("Success"))
+				return true;
+		}
+		return false;
 	}
 
 	private void preprocessBeforeExecuteTestScript(TestData testData, List<Device> devices) throws IOException {

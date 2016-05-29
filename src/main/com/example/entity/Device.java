@@ -11,26 +11,26 @@ public class Device {
 	private String serialNum;
 	private String modelAlias;
 	private String characteristic;
-	
-	public Device(String serialNum, String modelAlias, String characteristic){
+
+	public Device(String serialNum, String modelAlias, String characteristic) {
 		this.serialNum = serialNum;
 		this.modelAlias = modelAlias;
 		this.characteristic = characteristic;
 	}
-	
-	public String getSerialNum(){
+
+	public String getSerialNum() {
 		return this.serialNum;
 	}
-	
-	public String getModelAlias(){
+
+	public String getModelAlias() {
 		return this.modelAlias;
 	}
-	
-	public String getModelAliasWithDash(){
+
+	public String getModelAliasWithDash() {
 		return this.modelAlias.replace(" ", "_");
 	}
-	
-	public boolean isWearable(){
+
+	public boolean isWearable() {
 		return this.characteristic.contains("watch");
 	}
 
@@ -55,29 +55,38 @@ public class Device {
 	}
 
 	public void uninstallApk(String packageName) {
-		System.out.println("【uninstallWearApk】");
+		System.out.println("【uninstallWearApk】【" + this.getSerialNum() + "】【" + packageName + "】");
 		Utility.cmd("uninstallApk", CoreOptions.PYTHON, CoreOptions.UNINSTALL_APK_DIR, this.getSerialNum(),
 				packageName);
 	}
 
-	public void launchApp(HashMap<String, HashMap<String, String>> apkInfo)
-			throws IOException, InterruptedException {
-		System.out.println("【launchApp】 ");
-		String packageName = apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE);
-		String launchableActivity = apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY);
-		launch(packageName, launchableActivity);
-	}
-
-	private void launch(String packageName, String mainActivity)
-			throws IOException, InterruptedException {
+	public void launchApp(String packageName, String mainActivity) throws IOException, InterruptedException {
+		System.out.println("【launchApp】");
 		Utility.cmd("launch", CoreOptions.PYTHON, CoreOptions.LAUNCH_APK_DIR, this.getSerialNum(),
 				packageName + "/" + mainActivity);
 	}
 
 	public List<String> waitWearInstallApp(String packageName) {
-		System.out.println("【waitWearInstallApp】");
-		System.out.println("【waitWearInstallApp】package: " + packageName);
+		System.out.println("【waitWearInstallApp】" + packageName);
 		return Utility.cmd("waitWearInstallApp", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\waitWearAppInstall.py",
 				this.getSerialNum(), packageName);
+	}
+
+	public void makeWearVisible() {
+		System.out.println("【makeWearVisible】");
+		Utility.cmd("makeWearVisible", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\makeWearVisible.py",
+				this.getSerialNum());
+	}
+
+	public void pair(Device wear) {
+		System.out.println("【pair】");
+		Utility.cmd("pair", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\pair.py", this.getSerialNum(),
+				wear.getSerialNum());
+	}
+
+	public void forgetWatch() {
+		System.out.println("【forgetWatch】");
+		Utility.cmd("forgetWatch", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\forgetWatch.py",
+				this.getSerialNum());
 	}
 }

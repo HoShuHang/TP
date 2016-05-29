@@ -10,9 +10,10 @@ public class CoreOptions {
 	public final static int INTERVAL_SPACE_NUM = 4;
 	public final static String TAG_MOBILE = "mobile";
 	public final static String TAG_WEAR = "wear";
+	public final static String TAG_REPORT = "report";
 	public final static String TAG_PAIR_DEVICE = "pair_device";
 	public final static String LOG_PATH = "D:\\Thesis\\UploadSpace\\Log.txt";
-	public final static String SCRIPT_DIR = "D:\\Thesis\\Script";	
+	public final static String SCRIPT_DIR = "D:\\Thesis\\Script";
 	public final static String APK_INFO_GETTER_DIR = SCRIPT_DIR + "\\ApkInfoGetter.py";
 	public final static String TURN_OFF_BLUETOOTH_DIR = SCRIPT_DIR + "\\turnOffBluetooth.py";
 	public final static String TURN_ON_BLUETOOTH_DIR = SCRIPT_DIR + "\\turnOnBluetooth.py";
@@ -24,4 +25,6 @@ public class CoreOptions {
 	public final static String TAG_APK_PACKAGE = "package";
 	public final static String LAUNCH_APK_DIR = SCRIPT_DIR + "\\launchApk.py";
 	public final static String TAG_APK_LAUNCHABLE_ACTIVITY = "launchable-activity";
+	public final static String COMPANION_PACHAKGE = "com.google.android.wearable.app";
+	public final static String COMPANION_LAUNCHABLE_ACTIVITY = "com.google.android.clockwork.companion.StatusActivity";
 }

@@ -3,11 +3,11 @@ package main.com.example;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
@@ -29,7 +29,7 @@ public class ExecuteRunnable implements Runnable {
 
 	@Override
 	public void run(){
-		List<String> report = null;
+		List<HashMap<String, Object>> report = null;
 		try {
 			this.testData = this.parseTestData(this.req);
 			ExecutorBuilder builder = new ExecutorBuilder();
@@ -77,7 +77,7 @@ public class ExecuteRunnable implements Runnable {
 			return Tool.RobotFramework;
 	}
 	
-	private List<String> executeTest(TestExecutor executor, TestData testData) throws IOException, InterruptedException, ZipException {
+	private List<HashMap<String, Object>> executeTest(TestExecutor executor, TestData testData) throws IOException, InterruptedException, ZipException {
 		executor.execute(testData);
 		return executor.getTestReport();
 	}

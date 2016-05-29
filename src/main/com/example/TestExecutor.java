@@ -16,8 +16,8 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 public interface TestExecutor {
-	public List<String> report = new ArrayList<String>();
-	
+//	public List<String> report = new ArrayList<String>();
+	public List<HashMap<String, Object>> lstReport = new ArrayList<HashMap<String, Object>>();
 	public default void unzipProject(TestData testData) throws IOException, ZipException{
 		ZipFile zip = testData.getProject();
 		zip.extractAll(CoreOptions.UPLOAD_DIRECTORY);
@@ -30,8 +30,11 @@ public interface TestExecutor {
 	
 	public void executeTest(TestData testData) throws IOException, InterruptedException, ZipException;
 	
-	public default List<String> getTestReport() {
-		return report;
+//	public default List<String> getTestReport() {
+//		return report;
+//	}
+	public default List<HashMap<String, Object>> getTestReport() {
+		return lstReport;
 	}
 	
 	public default File[] getApkFileInDir(String dir){
