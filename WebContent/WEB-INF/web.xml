@@ -25,4 +25,9 @@
 		<servlet-name>StartTestServlet</servlet-name>
 		<url-pattern>/device</url-pattern>
 	</servlet-mapping>
+	<listener>
+		<listener-class>
+			main.com.example.MyContextListener
+		</listener-class>
+	</listener>
 </web-app>

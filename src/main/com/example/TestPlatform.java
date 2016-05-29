@@ -1,9 +1,11 @@
 package main.com.example;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import main.com.example.entity.*;
+import net.lingala.zip4j.exception.ZipException;
 
 public class TestPlatform {
 	private List<Device> devices, phones, wearable = null;
@@ -31,5 +33,25 @@ public class TestPlatform {
 
 	public List<Device> getWearable() {
 		return this.wearable;
+	}
+	
+	public List<String> execute(TestData testData) {
+		ExecutorBuilder builder = new ExecutorBuilder();
+		TestExecutor executor = builder.build(testData.getTool());
+		List<String> output = null;
+		try {
+			output = this.executeTest(executor, testData);
+		} catch (InterruptedException | ZipException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return output;
+	}
+
+	private List<String> executeTest(TestExecutor executor, TestData testData)
+			throws IOException, InterruptedException, ZipException {
+		executor.execute(testData);
+		return executor.getTestReport();
 	}
 }

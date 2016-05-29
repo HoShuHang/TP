@@ -13,18 +13,14 @@ import main.com.example.TestPlatform;
 import main.com.example.entity.Device;
 
 @WebServlet(name = "StartTestServlet", urlPatterns = { "/device" })
-public class StartTestServlet extends HttpServlet{
+public class StartTestServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		TestPlatform testPlatform;
-		try {
-			testPlatform = new TestPlatform();
-			List<Device> phones = testPlatform.getPhones();
-			List<Device> wearable = testPlatform.getWearable();
-			req.setAttribute("phones", phones);
-			req.setAttribute("wearable", wearable);
-			req.getRequestDispatcher("/execute.jsp").forward(req, resp);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		testPlatform = (TestPlatform) this.getServletContext().getAttribute("testPlatform");
+		List<Device> phones = testPlatform.getPhones();
+		List<Device> wearable = testPlatform.getWearable();
+		req.setAttribute("phones", phones);
+		req.setAttribute("wearable", wearable);
+		req.getRequestDispatcher("/execute.jsp").forward(req, resp);
 	}
 }
