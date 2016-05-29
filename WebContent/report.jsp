@@ -19,7 +19,7 @@
 
 		for (int i = 1; i <= line_size; i++) {
 	%>
-	<p><%=request.getAttribute(TAG_REPORT + "_" + i)%></p>
+	<p><%=application.getAttribute(TAG_REPORT + "_" + i)%></p>
 	<%
 		}
 	%>

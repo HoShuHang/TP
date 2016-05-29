@@ -70,7 +70,7 @@ public class Device {
 
 	private void launch(String packageName, String mainActivity)
 			throws IOException, InterruptedException {
-		Utility.cmd(CoreOptions.PYTHON, CoreOptions.LAUNCH_APK_DIR, this.getSerialNum(),
+		Utility.cmd("launch", CoreOptions.PYTHON, CoreOptions.LAUNCH_APK_DIR, this.getSerialNum(),
 				packageName + "/" + mainActivity);
 	}
 
