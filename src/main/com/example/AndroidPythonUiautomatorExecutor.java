@@ -34,17 +34,21 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 		File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
 		HashMap<String, HashMap<String, String>> apkInfo = this.deviceController.getApkInfo(apkFiles);
 		for (Device phone : testData.getPhones()) {
-			phone.turnOnBluetooth();
+//			phone.turnOnBluetooth();
 //			this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
 //			this.deviceController.launchApp(phone, apkInfo);
 			for (Device wear : testData.getWearable()) {
-				wear.clearWearGms();
+//				wear.clearWearGms();
 //				this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-				report.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
-				report.addAll(this.execute(phone, wear));
+				HashMap<String, Object> report = new HashMap<String, Object>();
+				report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
+				report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());
+				report.put(CoreOptions.TAG_REPORT, this.execute(phone, wear));
+//				lstReport.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
+//				lstReport.addAll(this.execute(phone, wear));
 //				this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 			}
-			phone.turnOffBluetooth();
+//			phone.turnOffBluetooth();
 		}
 	}
 

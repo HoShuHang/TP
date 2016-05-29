@@ -10,6 +10,7 @@ public class CoreOptions {
 	public final static int INTERVAL_SPACE_NUM = 4;
 	public final static String TAG_MOBILE = "mobile";
 	public final static String TAG_WEAR = "wear";
+	public final static String TAG_REPORT = "report";
 	public final static String TAG_PAIR_DEVICE = "pair_device";
 	public final static String LOG_PATH = "D:\\Thesis\\UploadSpace\\Log.txt";
 	public final static String SCRIPT_DIR = "D:\\Thesis\\Script";
