@@ -27,6 +27,7 @@ import main.com.example.ADB;
 import main.com.example.AndroidPythonUiautomatorExecutor;
 import main.com.example.ExecuteRunnable;
 import main.com.example.TestExecutor;
+import main.com.example.TestPlatform;
 import main.com.example.entity.Device;
 import main.com.example.entity.ExecutorBuilder;
 import main.com.example.entity.TestData;
@@ -62,14 +63,8 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		} catch (ZipException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		ExecutorBuilder builder = new ExecutorBuilder();
-		TestExecutor executor = builder.build(testData.getTool());
-		List<String> output = null;
-		try {
-			output = this.executeTest(executor, testData);
-		} catch (InterruptedException | ZipException e) {
-			e.printStackTrace();
-		}
+		TestPlatform testPlatform = (TestPlatform) this.getServletContext().getAttribute("testPlatform");
+		List<String> output = testPlatform.execute(testData);
 		ServletContext application = this.getServletContext();
 		application.setAttribute(TAG_REPORT_SIZE, output.size());
 		int lineCnt = 1;
@@ -108,12 +103,6 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 			return Tool.UIAutomator;
 		else
 			return Tool.RobotFramework;
-	}
-
-	private List<String> executeTest(TestExecutor executor, TestData testData)
-			throws IOException, InterruptedException, ZipException {
-		executor.execute(testData);
-		return executor.getTestReport();
 	}
 }
 
