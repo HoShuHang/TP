@@ -24,6 +24,7 @@ import main.com.example.TestExecutor;
 import main.com.example.TestPlatform;
 import main.com.example.entity.Device;
 import main.com.example.entity.ExecutorBuilder;
+import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
 import main.com.example.entity.Tool;
 import main.com.example.utility.CoreOptions;
@@ -58,13 +59,8 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		TestPlatform testPlatform = (TestPlatform) this.getServletContext().getAttribute("testPlatform");
-		List<HashMap<String, Object>> output = testPlatform.execute(testData);
+		List<Report> output = testPlatform.execute(testData);
 		ServletContext application = this.getServletContext();
-//		application.setAttribute(TAG_REPORT_SIZE, output.size());
-//		int lineCnt = 1;
-//		for (String line : output) {
-//			application.setAttribute(TAG_REPORT + "_" + lineCnt++, line);
-//		}
 		application.setAttribute(TAG_REPORT_LIST, output);
 		// go to "report.jsp"
 		resp.sendRedirect("report.jsp");

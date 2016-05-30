@@ -7,6 +7,7 @@ import java.util.List;
 
 import main.com.example.entity.Device;
 import main.com.example.entity.ExecutorBuilder;
+import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
 import net.lingala.zip4j.exception.ZipException;
 
@@ -38,10 +39,10 @@ public class TestPlatform {
 		return this.wearable;
 	}
 	
-	public List<HashMap<String, Object>> execute(TestData testData) {
+	public List<Report> execute(TestData testData) {
 		ExecutorBuilder builder = new ExecutorBuilder();
 		TestExecutor executor = builder.build(testData.getTool());
-		List<HashMap<String, Object>> output = null;
+		List<Report> output = null;
 		try {
 			output = this.executeTest(executor, testData);
 		} catch (InterruptedException | ZipException e) {
@@ -52,7 +53,7 @@ public class TestPlatform {
 		return output;
 	}
 
-	private List<HashMap<String, Object>> executeTest(TestExecutor executor, TestData testData)
+	private List<Report> executeTest(TestExecutor executor, TestData testData)
 			throws IOException, InterruptedException, ZipException {
 		executor.execute(testData);
 		return executor.getTestReport();

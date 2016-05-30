@@ -13,6 +13,7 @@ import javax.servlet.http.Part;
 
 import main.com.example.entity.Device;
 import main.com.example.entity.ExecutorBuilder;
+import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
 import main.com.example.entity.Tool;
 import main.com.example.utility.CoreOptions;
@@ -29,7 +30,7 @@ public class ExecuteRunnable implements Runnable {
 
 	@Override
 	public void run(){
-		List<HashMap<String, Object>> report = null;
+		List<Report> report = null;
 		try {
 			this.testData = this.parseTestData(this.req);
 			ExecutorBuilder builder = new ExecutorBuilder();
@@ -77,7 +78,7 @@ public class ExecuteRunnable implements Runnable {
 			return Tool.RobotFramework;
 	}
 	
-	private List<HashMap<String, Object>> executeTest(TestExecutor executor, TestData testData) throws IOException, InterruptedException, ZipException {
+	private List<Report> executeTest(TestExecutor executor, TestData testData) throws IOException, InterruptedException, ZipException {
 		executor.execute(testData);
 		return executor.getTestReport();
 	}
