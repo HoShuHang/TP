@@ -41,8 +41,8 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		for (Device phone : testData.getPhones()) {
 			for (Device wear : testData.getWearable()) {
 				Report report = new Report();
-				report.setPhone(phone.getSerialNum());
-				report.setWatch(wear.getSerialNum());
+				report.setPhone(phone);
+				report.setWatch(wear);
 				// report.add("-------------------Mobile: " +
 				// phone.getSerialNum() + ",Wearable: " + wear.getSerialNum()
 				// + "-------------------");
