@@ -18,8 +18,8 @@ public class TestData {
 	private InputStream fileContent = null;
 	private Tool tool;
 	private ZipFile project;
-	
-	public TestData(){
+
+	public TestData() {
 		this.phones = new ArrayList<Device>();
 		this.wearable = new ArrayList<Device>();
 	}
@@ -31,8 +31,8 @@ public class TestData {
 	}
 
 	public void setDevices(List<Device> devices) {
-		for(Device d : devices){
-			if(d.isWearable())
+		for (Device d : devices) {
+			if (d.isWearable())
 				this.wearable.add(d);
 			else
 				this.phones.add(d);
@@ -55,18 +55,29 @@ public class TestData {
 		return maps;
 	}
 
+	public List<Pair> getPairs() {
+		List<Pair> pairs = new ArrayList<Pair>();
+		for (Device phone : this.getPhones()) {
+			for(Device wear : this.getWearable()){
+				Pair pair = new Pair(phone, wear);
+				pairs.add(pair);
+			}
+		}
+		return pairs;
+	}
+
 	public List<Device> getPhones() {
 		return this.phones;
 	}
-	
+
 	public List<Device> getWearable() {
 		return this.wearable;
 	}
-	
+
 	public ZipFile getProject() {
 		return this.project;
 	}
-	
+
 	public String getProjectFullPath() {
 		return CoreOptions.UPLOAD_DIRECTORY + File.separator + this.fileName;
 	}
