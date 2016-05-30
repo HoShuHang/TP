@@ -3,27 +3,27 @@ package main.com.example.entity;
 import java.util.List;
 
 public class Report {
-	private String phone;
-	private String watch;
+	private Device phone;
+	private Device watch;
 	private boolean isPassTesting;
 	private List<String> testingMessage;
 	private int totalTestCase;
 	private int passTestCaseNumber;
 	private int failTestCaseNumber;
 
-	public String getPhone() {
+	public Device getPhone() {
 		return phone;
 	}
 
-	public void setPhone(String phone) {
+	public void setPhone(Device phone) {
 		this.phone = phone;
 	}
 
-	public String getWatch() {
+	public Device getWatch() {
 		return watch;
 	}
 
-	public void setWatch(String watch) {
+	public void setWatch(Device watch) {
 		this.watch = watch;
 	}
 

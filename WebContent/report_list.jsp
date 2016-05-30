@@ -55,8 +55,8 @@
 				Report report = lstReport.get(i);
 			%>
 			<tr>
-				<td align="center"><%=report.getPhone() %></td>
-				<td align="center"><%=report.getWatch() %></td>
+				<td align="center"><%=report.getPhone().getSerialNum() %></td>
+				<td align="center"><%=report.getWatch().getSerialNum() %></td>
 				<td align="center"><%=report.isPassTesting() %></td>
 				<td align="center">
 					<a href="report.jsp?id=<%=i %>">detail</a>
