@@ -44,9 +44,10 @@
 <body>
 	
 	<div align="center">
-		<table width="80%" align="center">
+		<table width="60%" align="center" border="1">
 			<tr>
-				<td width="60%" align="center">Pair Device</td>
+				<td width="30%" align="center">Phone</td>
+				<td width="30%" align="center">Watch</td>
 				<td align="center">Status</td>
 				<td align="center">Detail</td>
 			</tr>
@@ -54,7 +55,8 @@
 				Report report = lstReport.get(i);
 			%>
 			<tr>
-				<td align="center"><%=report.getPhone() + " " + report.getWatch() %></td>
+				<td align="center"><%=report.getPhone() %></td>
+				<td align="center"><%=report.getWatch() %></td>
 				<td align="center"><%=report.isPassTesting() %></td>
 				<td align="center">
 					<a href="report.jsp?id=<%=i %>">detail</a>

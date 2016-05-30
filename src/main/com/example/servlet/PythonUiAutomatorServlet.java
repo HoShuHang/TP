@@ -63,7 +63,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		ServletContext application = this.getServletContext();
 		application.setAttribute(TAG_REPORT_LIST, output);
 		// go to "report.jsp"
-		resp.sendRedirect("report.jsp");
+		resp.sendRedirect("report_list.jsp");
 	}
 
 	private TestData parseTestData(HttpServletRequest req)
