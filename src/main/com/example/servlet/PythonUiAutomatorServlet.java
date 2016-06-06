@@ -78,7 +78,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		return testData;
 	}
 
-	private List<Device> parseDevices(HttpServletRequest req) throws InterruptedException {
+	private List<Device> parseDevices(HttpServletRequest req) throws InterruptedException, IOException {
 		List<Device> devices = new ArrayList<Device>();
 		for (Device device : ADB.getDevices()) {
 			if (req.getParameter(device.getModelAliasWithDash()) != null) {

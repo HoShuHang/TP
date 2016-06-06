@@ -2,6 +2,7 @@ package test.main.com.example.utility;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.junit.Before;
@@ -17,7 +18,7 @@ public class UtilityTest {
 	}
 	
 	@Test
-	public void testCmd() {
+	public void testCmd() throws IOException, InterruptedException {
 		List<String> result = Utility.cmd("testCmd",CoreOptions.ADB, "devices");
 		assertTrue(result.get(0).equals("List of devices attached"));
 	}

@@ -18,10 +18,12 @@ public class TestData {
 	private InputStream fileContent = null;
 	private Tool tool;
 	private ZipFile project;
+	private List<Pair> pairs;
 
 	public TestData() {
 		this.phones = new ArrayList<Device>();
 		this.wearable = new ArrayList<Device>();
+		this.pairs = new ArrayList<Pair>();
 	}
 
 	public void setProject(String fileName, InputStream fileContent) throws ZipException {
@@ -36,6 +38,12 @@ public class TestData {
 				this.wearable.add(d);
 			else
 				this.phones.add(d);
+		}
+		for (Device phone : this.getPhones()) {
+			for(Device wear : this.getWearable()){
+				Pair pair = new Pair(phone, wear);
+				this.pairs.add(pair);
+			}
 		}
 	}
 
@@ -56,14 +64,7 @@ public class TestData {
 	}
 
 	public List<Pair> getPairs() {
-		List<Pair> pairs = new ArrayList<Pair>();
-		for (Device phone : this.getPhones()) {
-			for(Device wear : this.getWearable()){
-				Pair pair = new Pair(phone, wear);
-				pairs.add(pair);
-			}
-		}
-		return pairs;
+		return this.pairs;
 	}
 
 	public List<Device> getPhones() {

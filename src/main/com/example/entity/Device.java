@@ -49,12 +49,12 @@ public class Device {
 		Utility.cmd("clearWearGms", CoreOptions.PYTHON, CoreOptions.CLEAR_GMS_DIR, this.getSerialNum());
 	}
 
-	public void installApk(String apkPath) {
+	public void installApk(String apkPath) throws IOException, InterruptedException {
 		System.out.println("【installApk】" + this.getSerialNum());
 		Utility.cmd("installApk", CoreOptions.PYTHON, CoreOptions.INSTALL_APK_DIR, this.getSerialNum(), apkPath);
 	}
 
-	public void uninstallApk(String packageName) {
+	public void uninstallApk(String packageName) throws IOException, InterruptedException {
 		System.out.println("【uninstallWearApk】【" + this.getSerialNum() + "】【" + packageName + "】");
 		Utility.cmd("uninstallApk", CoreOptions.PYTHON, CoreOptions.UNINSTALL_APK_DIR, this.getSerialNum(),
 				packageName);
@@ -66,25 +66,25 @@ public class Device {
 				packageName + "/" + mainActivity);
 	}
 
-	public List<String> waitWearInstallApp(String packageName) {
+	public List<String> waitWearInstallApp(String packageName) throws IOException, InterruptedException {
 		System.out.println("【waitWearInstallApp】" + packageName);
 		return Utility.cmd("waitWearInstallApp", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\waitWearAppInstall.py",
 				this.getSerialNum(), packageName);
 	}
 
-	public void makeWearVisible() {
+	public void makeWearVisible() throws IOException, InterruptedException {
 		System.out.println("【makeWearVisible】");
 		Utility.cmd("makeWearVisible", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\makeWearVisible.py",
 				this.getSerialNum());
 	}
 
-	public void pair(Device wear) {
+	public void pair(Device wear) throws IOException, InterruptedException {
 		System.out.println("【pair】");
 		Utility.cmd("pair", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\pair.py", this.getSerialNum(),
 				wear.getSerialNum());
 	}
 
-	public void forgetWatch() {
+	public void forgetWatch() throws IOException, InterruptedException {
 		System.out.println("【forgetWatch】");
 		Utility.cmd("forgetWatch", CoreOptions.PYTHON, CoreOptions.SCRIPT_DIR + "\\forgetWatch.py",
 				this.getSerialNum());

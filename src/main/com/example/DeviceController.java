@@ -17,7 +17,7 @@ public class DeviceController {
 	private final String TAG_APK_LAUNCHABLE_ACTIVITY = "launchable-activity";
 
 	/* get file path, package and launchable-activity from apk */
-	public HashMap<String, HashMap<String, String>> getApkInfo(File[] apkFiles) {
+	public HashMap<String, HashMap<String, String>> getApkInfo(File[] apkFiles) throws IOException, InterruptedException {
 		HashMap<String, HashMap<String, String>> apkInfo = new HashMap<String, HashMap<String, String>>();
 		for (File file : apkFiles) {
 			String tagDevice = CoreOptions.TAG_WEAR;
@@ -36,7 +36,7 @@ public class DeviceController {
 
 	}
 
-	private String getSpecValue(File apk, String target) {
+	private String getSpecValue(File apk, String target) throws IOException, InterruptedException {
 		List<String> result = Utility.cmd("getSpecValue", CoreOptions.PYTHON, CoreOptions.APK_INFO_GETTER_DIR,
 				apk.getAbsolutePath(), target);
 		return result.get(0).replaceAll("\\r\\n", "");

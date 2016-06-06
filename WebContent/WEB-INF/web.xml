@@ -25,6 +25,14 @@
 		<servlet-name>StartTestServlet</servlet-name>
 		<url-pattern>/device</url-pattern>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>PairsServlet</servlet-name>
+		<servlet-class>main.com.example.servlet.PairsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PairsServlet</servlet-name>
+		<url-pattern>/pairs</url-pattern>
+	</servlet-mapping>
 	<listener>
 		<listener-class>
 			main.com.example.MyContextListener

@@ -13,30 +13,20 @@ import java.util.Map;
 import main.com.example.StreamConsumer;
 
 public class Utility {
-	public static List<String> cmd(String action, String... command) {
+	public static List<String> cmd(String action, String... command) throws IOException, InterruptedException {
 		ProcessBuilder proc = new ProcessBuilder(command);
-		Map<String, String> env = proc.environment();
 		proc.environment().put("ANDROID_HOME", CoreOptions.ANDROID_HOME);
 		StreamConsumer outputConsumer = null;
 		StreamConsumer errorConsumer = null;
 		Process p = null;
-		try {
-			p = proc.start();
-			outputConsumer = new StreamConsumer(p.getInputStream(), action);
-			errorConsumer = new StreamConsumer(p.getErrorStream(), action);
-			outputConsumer.start();
-			errorConsumer.start();
-			p.waitFor();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			p.destroy();
-		}
+		p = proc.start();
+		outputConsumer = new StreamConsumer(p.getInputStream(), action);
+		errorConsumer = new StreamConsumer(p.getErrorStream(), action);
+		outputConsumer.start();
+		errorConsumer.start();
+		p.waitFor();
 		return outputConsumer.getOutput();
 	}
-	
 
 	public static List<String> readFile(File file) throws IOException {
 		List<String> content = new ArrayList<String>();
@@ -52,7 +42,7 @@ public class Utility {
 		}
 		return content;
 	}
-	
+
 	public static void writeFile(File file, List<String> content) {
 		FileWriter fw;
 		try {
@@ -67,10 +57,10 @@ public class Utility {
 			e.printStackTrace();
 		}
 	}
-	
-	public static boolean isContain(List<String> text, String word){
-		for(String line : text){
-			if(text.contains(word)){
+
+	public static boolean isContain(List<String> text, String word) {
+		for (String line : text) {
+			if (text.contains(word)) {
 				return true;
 			}
 		}
