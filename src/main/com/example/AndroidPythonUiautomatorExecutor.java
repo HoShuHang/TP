@@ -13,6 +13,7 @@ import java.util.List;
 
 import main.com.example.entity.Device;
 import main.com.example.entity.Pair;
+import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
 import main.com.example.utility.Utility;
@@ -34,14 +35,25 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor {
 		findTestRunner(testData.getProjectFullPath().substring(0, index));
 		File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
 		HashMap<String, HashMap<String, String>> apkInfo = this.deviceController.getApkInfo(apkFiles);
-
+		
 		for (Pair pair : testData.getPairs()) {
 			Device phone = pair.getPhone();
 			Device wear = pair.getWear();
-			HashMap<String, Object> report = new HashMap<String, Object>();
-			report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
-			report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());
-			report.put(CoreOptions.TAG_REPORT, this.execute(phone, wear));
+			Report report = new Report();
+			report.setPair(pair);
+			List<String> testingMessage = this.execute(phone, wear);
+			report.setTestingMessage(testingMessage);
+//			report.setPassTestCaseNumber(parser.getPassTestCaseNumber(testingMessage));
+//			report.setPassTesting(parser.isPassTesting(testingMessage));
+//			report.setFailTestCaseNumber(parser.getFailTestCaseNumber(testingMessage));
+//			report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
+//			report.setTestingMessage(parser.getTestingMessage(testingMessage));
+			pair.setReport(report);
+			pair.setTestComplete(true);
+			//HashMap<String, Object> report = new HashMap<String, Object>();
+//			report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
+//			report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());
+//			report.put(CoreOptions.TAG_REPORT, this.execute(phone, wear));
 		}
 
 //		for (Device phone : testData.getPhones()) {
@@ -173,9 +185,12 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor {
 	}
 
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
-
-		List<String> output = Utility.cmd(CoreOptions.PYTHON, this.mainTestRunner.getAbsolutePath(),
+//		Utility.cmd("chmod", "+x", this.mainTestRunner.getAbsolutePath());
+		List<String> output = Utility.cmd("test", CoreOptions.PYTHON, this.mainTestRunner.getAbsolutePath(),
 				phone.getSerialNum(), wear.getSerialNum());
+		
+//		List<String> output = Utility.cmd("ADB",CoreOptions.ADB, "devices");
+		
 
 		// List<String> output = new ArrayList<String>();
 		// ProcessBuilder proc = new ProcessBuilder(CoreOptions.PYTHON,

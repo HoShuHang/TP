@@ -71,8 +71,7 @@
 		<!-- /.navbar-collapse -->
 	</div>
 	<!-- /.container-fluid --> </nav>
-	<Form Method="POST" Action="execute"
-		Enctype="Multipart/Form-Data">
+	<Form Method="POST" Action="execute" Enctype="Multipart/Form-Data">
 		<section id="tool">
 		<div class="container">
 			<!-- Team Members Row -->

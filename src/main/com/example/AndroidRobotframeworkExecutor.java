@@ -57,6 +57,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			report.setFailTestCaseNumber(parser.getFailTestCaseNumber(testingMessage));
 			report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
 			report.setTestingMessage(parser.getTestingMessage(testingMessage));
+			pair.setReport(report);
 			lstReport.add(report);
 			pair.setTestComplete(true);
 		}
