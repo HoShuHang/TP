@@ -42,7 +42,7 @@
 	rel="stylesheet" type="text/css">
 </head>
 <body>
-	
+	<h1>Report List</h1>
 	<div align="center">
 		<table width="60%" align="center" border="1">
 			<tr>

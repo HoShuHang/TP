@@ -38,7 +38,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td align="left"><%=report.getTestingMessage()%></td>
+			<td align="left" colspan="2"><%=report.getTestingMessage()%></td>
 		</tr>
 	</table>
 </body>

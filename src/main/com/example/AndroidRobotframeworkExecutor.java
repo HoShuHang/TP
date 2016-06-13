@@ -43,26 +43,17 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 				Report report = new Report();
 				report.setPhone(phone);
 				report.setWatch(wear);
-				// report.add("-------------------Mobile: " +
-				// phone.getSerialNum() + ",Wearable: " + wear.getSerialNum()
-				// + "-------------------");
-				// phone.turnOnBluetooth();
-				// wear.clearWearGms();
-				// wear.makeWearVisible();
-				// phone.launchApp(CoreOptions.COMPANION_PACHAKGE,
-				// CoreOptions.COMPANION_LAUNCHABLE_ACTIVITY);
-				// phone.pair(wear);
-				//
-				phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
-
-				phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
+				// phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
+				// Utility.cmd("installApp", CoreOptions.ADB, "-s",
+				// phone.getSerialNum(), "install",
+				// apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
 				// List<String> result = wear
 				// .waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+
 				// if (Utility.isContain(result, "Timeout")) {
 				// List<String> reportContent = new ArrayList<String>();
 				// reportContent.add("The app doesn't sync to watch.");
-				// report.put(CoreOptions.TAG_REPORT, reportContent);
-				// //// report.add("The app doesn't sync to watch.");
+				// report.setTestingMessage(reportContent);
 				// } else {
 				List<Device> devices = new ArrayList<Device>();
 				devices.add(phone);
@@ -76,16 +67,17 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 				report.setFailTestCaseNumber(parser.getFailTestCaseNumber(testingMessage));
 				report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
 				report.setTestingMessage(parser.getTestingMessage(testingMessage));
-				// report.addAll(execute(phone, wear));
+
 				// }
-				//
-				// wear.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-				//
 				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-				//
+				// Utility.cmd("uninstall", CoreOptions.ADB, "-s",
+				// phone.getSerialNum(), "uninstall",
+				// apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+				// Utility.cmd("【killProcess】", CoreOptions.ADB, "-s",
+				// phone.getSerialNum(), "shell", "am", "force-stop",
+				// apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
+				// //
 				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
-				// phone.turnOffBluetooth();
-				// phone.forgetWatch();
 				lstReport.add(report);
 			}
 		}
