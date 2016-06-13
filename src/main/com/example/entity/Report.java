@@ -27,6 +27,11 @@ public class Report {
 		this.watch = watch;
 	}
 
+	public void setPair(Pair pair) {
+		this.phone = pair.getPhone();
+		this.watch = pair.getWear();
+	}
+
 	public boolean isPassTesting() {
 		return isPassTesting;
 	}

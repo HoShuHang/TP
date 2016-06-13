@@ -16,7 +16,7 @@ public class ADB {
 		return System.getenv("ANDROID_HOME");
 	}
 
-	public static List<Device> getDevices() throws InterruptedException {
+	public static List<Device> getDevices() throws InterruptedException, IOException {
 		if (devices == null || devices.isEmpty()) {
 			devices = new ArrayList<Device>();
 			for (String deviceSerialNum : getDeviceSerialNums()) {
@@ -39,7 +39,7 @@ public class ADB {
 		return devices;
 	}
 
-	public static List<String> getDeviceSerialNums() throws InterruptedException {
+	public static List<String> getDeviceSerialNums() throws InterruptedException, IOException {
 		List<String> lstDevices = new ArrayList<String>();
 		List<String> lstResults = null;
 		Utility.cmd("getDeviceSerialNums", CoreOptions.ADB, "kill-server");
@@ -52,7 +52,7 @@ public class ADB {
 		return lstDevices;
 	}
 
-	private static List<String> getDeviceProp(String deviceSerialNum, String prop) {
+	private static List<String> getDeviceProp(String deviceSerialNum, String prop) throws IOException, InterruptedException {
 		return Utility.cmd("getDeviceProp", CoreOptions.ADB, "-s", deviceSerialNum, "shell", "getprop", prop);
 	}
 }

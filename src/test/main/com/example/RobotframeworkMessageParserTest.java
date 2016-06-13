@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import main.com.example.MessageParser;
 import main.com.example.RobotframeworkMessageParser;
+import main.com.example.utility.CoreOptions;
 import main.com.example.utility.Utility;
 
 public class RobotframeworkMessageParserTest {
@@ -19,8 +20,14 @@ public class RobotframeworkMessageParserTest {
 	MessageParser parser;
 	@Before
 	public void setUp() throws IOException {
-		passMessage = Utility.readFile(new File("D:\\message.txt"));
-		failMessage = Utility.readFile(new File("D:\\fail_message.txt"));
+		final String MESSAGE_PATH = "D:\\message.txt";
+		final String FAIL_MESSAGE_PATH = "D:\\fail_message.txt";
+		File messageFile = new File(MESSAGE_PATH);
+		assertTrue(messageFile.exists());
+		File failMessageFile = new File(FAIL_MESSAGE_PATH);
+		assertTrue(failMessageFile.exists());
+		passMessage = Utility.readFile(new File(MESSAGE_PATH));
+		failMessage = Utility.readFile(new File(FAIL_MESSAGE_PATH));
 		parser = new RobotframeworkMessageParser();
 	}
 	

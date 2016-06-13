@@ -1,5 +1,7 @@
 package main.com.example;
 
+import java.io.IOException;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -17,6 +19,8 @@ public class MyContextListener implements ServletContextListener {
 			TestPlatform testPlatform = new TestPlatform();
 			sc.setAttribute("testPlatform", testPlatform);
 		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

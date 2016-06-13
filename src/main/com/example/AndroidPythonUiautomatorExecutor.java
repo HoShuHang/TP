@@ -12,20 +12,22 @@ import java.util.HashMap;
 import java.util.List;
 
 import main.com.example.entity.Device;
+import main.com.example.entity.Pair;
+import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
 import main.com.example.utility.Utility;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
-public class AndroidPythonUiautomatorExecutor implements TestExecutor{
+public class AndroidPythonUiautomatorExecutor implements TestExecutor {
 	private final String PYTHON = "python.exe";
 	private File mainTestRunner;
 	private DeviceController deviceController = null;
 
 	public AndroidPythonUiautomatorExecutor() {
 		this.deviceController = new DeviceController();
-	}	
+	}
 
 	@Override
 	public void executeTest(TestData testData) throws IOException, InterruptedException, ZipException {
@@ -33,23 +35,49 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 		findTestRunner(testData.getProjectFullPath().substring(0, index));
 		File[] apkFiles = this.getApkFileInDir(CoreOptions.UPLOAD_DIRECTORY);
 		HashMap<String, HashMap<String, String>> apkInfo = this.deviceController.getApkInfo(apkFiles);
-		for (Device phone : testData.getPhones()) {
-//			phone.turnOnBluetooth();
-//			this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
-//			this.deviceController.launchApp(phone, apkInfo);
-			for (Device wear : testData.getWearable()) {
-//				wear.clearWearGms();
-//				this.deviceController.installApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-				HashMap<String, Object> report = new HashMap<String, Object>();
-				report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
-				report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());
-				report.put(CoreOptions.TAG_REPORT, this.execute(phone, wear));
-//				lstReport.add("-------------------Mobile: " + phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() + "-------------------");
-//				lstReport.addAll(this.execute(phone, wear));
-//				this.deviceController.uninstallApk(phone, apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-			}
-//			phone.turnOffBluetooth();
+		
+		for (Pair pair : testData.getPairs()) {
+			Device phone = pair.getPhone();
+			Device wear = pair.getWear();
+			Report report = new Report();
+			report.setPair(pair);
+			List<String> testingMessage = this.execute(phone, wear);
+			report.setTestingMessage(testingMessage);
+//			report.setPassTestCaseNumber(parser.getPassTestCaseNumber(testingMessage));
+//			report.setPassTesting(parser.isPassTesting(testingMessage));
+//			report.setFailTestCaseNumber(parser.getFailTestCaseNumber(testingMessage));
+//			report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
+//			report.setTestingMessage(parser.getTestingMessage(testingMessage));
+			pair.setReport(report);
+			pair.setTestComplete(true);
+			//HashMap<String, Object> report = new HashMap<String, Object>();
+//			report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
+//			report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());
+//			report.put(CoreOptions.TAG_REPORT, this.execute(phone, wear));
 		}
+
+//		for (Device phone : testData.getPhones()) {
+//			// phone.turnOnBluetooth();
+//			// this.deviceController.installApk(phone,
+//			// apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
+//			// this.deviceController.launchApp(phone, apkInfo);
+//			for (Device wear : testData.getWearable()) {
+//				// wear.clearWearGms();
+//				// this.deviceController.installApk(phone,
+//				// apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
+//				HashMap<String, Object> report = new HashMap<String, Object>();
+//				report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
+//				report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());
+//				report.put(CoreOptions.TAG_REPORT, this.execute(phone, wear));
+//				// lstReport.add("-------------------Mobile: " +
+//				// phone.getSerialNum() + ", Wearable: " + wear.getSerialNum() +
+//				// "-------------------");
+//				// lstReport.addAll(this.execute(phone, wear));
+//				// this.deviceController.uninstallApk(phone,
+//				// apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+//			}
+//			// phone.turnOffBluetooth();
+//		}
 	}
 
 	private void installApk(Device phone) throws IOException, InterruptedException {
@@ -57,7 +85,6 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
 		FileFilter filter = new FileFilterWithType("apk");
 		File[] files = folder.listFiles(filter);
-		
 
 		for (File apk : files) {
 			System.out.println("APK: " + apk.getName());
@@ -158,23 +185,29 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 	}
 
 	private List<String> execute(Device phone, Device wear) throws IOException, InterruptedException {
-
-		List<String> output = Utility.cmd(CoreOptions.PYTHON, this.mainTestRunner.getAbsolutePath(), phone.getSerialNum(), wear.getSerialNum());
+//		Utility.cmd("chmod", "+x", this.mainTestRunner.getAbsolutePath());
+		List<String> output = Utility.cmd("test", CoreOptions.PYTHON, this.mainTestRunner.getAbsolutePath(),
+				phone.getSerialNum(), wear.getSerialNum());
 		
-		//		List<String> output = new ArrayList<String>();
-//		ProcessBuilder proc = new ProcessBuilder(CoreOptions.PYTHON,
-//				mainTestRunner.getAbsolutePath(), phone.getSerialNum(), wear.getSerialNum());
-//
-//		
-//		Process p = proc.start();
-//		
-//		StreamConsumer errorConsumer = new StreamConsumer(p.getErrorStream(), "error");
-//
-//		errorConsumer.start();
-//
-//		p.waitFor();
-//		output = errorConsumer.getOutput();
-//		System.out.println("ExitVal: " + exitVal);
+//		List<String> output = Utility.cmd("ADB",CoreOptions.ADB, "devices");
+		
+
+		// List<String> output = new ArrayList<String>();
+		// ProcessBuilder proc = new ProcessBuilder(CoreOptions.PYTHON,
+		// mainTestRunner.getAbsolutePath(), phone.getSerialNum(),
+		// wear.getSerialNum());
+		//
+		//
+		// Process p = proc.start();
+		//
+		// StreamConsumer errorConsumer = new StreamConsumer(p.getErrorStream(),
+		// "error");
+		//
+		// errorConsumer.start();
+		//
+		// p.waitFor();
+		// output = errorConsumer.getOutput();
+		// System.out.println("ExitVal: " + exitVal);
 
 		return output;
 	}
@@ -182,7 +215,7 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor{
 	private void findTestRunner(String directory) throws IOException {
 		final String SETTING = "Setting";
 		File folder = new File(directory);
-//		System.out.println(folder.getPath());
+		// System.out.println(folder.getPath());
 		FileFilter filter = new FileFilterWithType("py");
 		File[] files = folder.listFiles(filter);
 		Arrays.sort(files, new FileSizeComparator());

@@ -18,10 +18,12 @@ public class TestData {
 	private InputStream fileContent = null;
 	private Tool tool;
 	private ZipFile project;
-	
-	public TestData(){
+	private List<Pair> pairs;
+
+	public TestData() {
 		this.phones = new ArrayList<Device>();
 		this.wearable = new ArrayList<Device>();
+		this.pairs = new ArrayList<Pair>();
 	}
 
 	public void setProject(String fileName, InputStream fileContent) throws ZipException {
@@ -31,11 +33,17 @@ public class TestData {
 	}
 
 	public void setDevices(List<Device> devices) {
-		for(Device d : devices){
-			if(d.isWearable())
+		for (Device d : devices) {
+			if (d.isWearable())
 				this.wearable.add(d);
 			else
 				this.phones.add(d);
+		}
+		for (Device phone : this.getPhones()) {
+			for(Device wear : this.getWearable()){
+				Pair pair = new Pair(phone, wear);
+				this.pairs.add(pair);
+			}
 		}
 	}
 
@@ -55,18 +63,22 @@ public class TestData {
 		return maps;
 	}
 
+	public List<Pair> getPairs() {
+		return this.pairs;
+	}
+
 	public List<Device> getPhones() {
 		return this.phones;
 	}
-	
+
 	public List<Device> getWearable() {
 		return this.wearable;
 	}
-	
+
 	public ZipFile getProject() {
 		return this.project;
 	}
-	
+
 	public String getProjectFullPath() {
 		return CoreOptions.UPLOAD_DIRECTORY + File.separator + this.fileName;
 	}

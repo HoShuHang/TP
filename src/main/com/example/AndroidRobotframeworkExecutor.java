@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import main.com.example.entity.Device;
+import main.com.example.entity.Pair;
 import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
 import main.com.example.utility.CoreOptions;
@@ -38,49 +39,80 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		MessageParser parser = new RobotframeworkMessageParser();
 		int index = testData.getProjectFullPath().length() - 4;
 		findTestRunner(testData.getProjectFullPath().substring(0, index));
-		for (Device phone : testData.getPhones()) {
-			for (Device wear : testData.getWearable()) {
-				Report report = new Report();
-				report.setPhone(phone);
-				report.setWatch(wear);
-				// phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-				// Utility.cmd("installApp", CoreOptions.ADB, "-s",
-				// phone.getSerialNum(), "install",
-				// apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-				// List<String> result = wear
-				// .waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
 
-				// if (Utility.isContain(result, "Timeout")) {
-				// List<String> reportContent = new ArrayList<String>();
-				// reportContent.add("The app doesn't sync to watch.");
-				// report.setTestingMessage(reportContent);
-				// } else {
-				List<Device> devices = new ArrayList<Device>();
-				devices.add(phone);
-				devices.add(wear);
-				preprocessBeforeExecuteTestScript(testData, devices);
-				phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
-						apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
-				List<String> testingMessage = execute(phone, wear);
-				report.setPassTestCaseNumber(parser.getPassTestCaseNumber(testingMessage));
-				report.setPassTesting(parser.isPassTesting(testingMessage));
-				report.setFailTestCaseNumber(parser.getFailTestCaseNumber(testingMessage));
-				report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
-				report.setTestingMessage(parser.getTestingMessage(testingMessage));
+		for (Pair pair : testData.getPairs()) {
+			Device phone = pair.getPhone();
+			Device wear = pair.getWear();
+			Report report = new Report();
+			report.setPair(pair);
+			phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
+			phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
 
-				// }
-				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-				// Utility.cmd("uninstall", CoreOptions.ADB, "-s",
-				// phone.getSerialNum(), "uninstall",
-				// apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-				// Utility.cmd("【killProcess】", CoreOptions.ADB, "-s",
-				// phone.getSerialNum(), "shell", "am", "force-stop",
-				// apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
-				// //
-				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
-				lstReport.add(report);
-			}
+			preprocessBeforeExecuteTestScript(testData, pair);
+			phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
+					apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
+			List<String> testingMessage = execute(phone, wear);
+			report.setPassTestCaseNumber(parser.getPassTestCaseNumber(testingMessage));
+			report.setPassTesting(parser.isPassTesting(testingMessage));
+			report.setFailTestCaseNumber(parser.getFailTestCaseNumber(testingMessage));
+			report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
+			report.setTestingMessage(parser.getTestingMessage(testingMessage));
+			pair.setReport(report);
+			lstReport.add(report);
+			pair.setTestComplete(true);
 		}
+
+//		for (Device phone : testData.getPhones()) {
+//			for (Device wear : testData.getWearable()) {
+//				Report report = new Report();
+//				report.setPhone(phone);
+//				report.setWatch(wear);
+//				// report.add("-------------------Mobile: " +
+//				// phone.getSerialNum() + ",Wearable: " + wear.getSerialNum()
+//				// + "-------------------");
+//				// phone.turnOnBluetooth();
+//				// wear.clearWearGms();
+//				// wear.makeWearVisible();
+//				// phone.launchApp(CoreOptions.COMPANION_PACHAKGE,
+//				// CoreOptions.COMPANION_LAUNCHABLE_ACTIVITY);
+//				// phone.pair(wear);
+//				//
+//				phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
+//
+//				phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
+//				// List<String> result = wear
+//				// .waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+//				// if (Utility.isContain(result, "Timeout")) {
+//				// List<String> reportContent = new ArrayList<String>();
+//				// reportContent.add("The app doesn't sync to watch.");
+//				// report.put(CoreOptions.TAG_REPORT, reportContent);
+//				// //// report.add("The app doesn't sync to watch.");
+//				// } else {
+//				List<Device> devices = new ArrayList<Device>();
+//				devices.add(phone);
+//				devices.add(wear);
+//				preprocessBeforeExecuteTestScript(testData, devices);
+//				phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
+//						apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
+//				List<String> testingMessage = execute(phone, wear);
+//				report.setPassTestCaseNumber(parser.getPassTestCaseNumber(testingMessage));
+//				report.setPassTesting(parser.isPassTesting(testingMessage));
+//				report.setFailTestCaseNumber(parser.getFailTestCaseNumber(testingMessage));
+//				report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
+//				report.setTestingMessage(parser.getTestingMessage(testingMessage));
+//				// report.addAll(execute(phone, wear));
+//				// }
+//				//
+//				// wear.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+//				//
+//				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
+//				//
+//				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
+//				// phone.turnOffBluetooth();
+//				// phone.forgetWatch();
+//				lstReport.add(report);
+//			}
+//		}
 	}
 
 	private boolean isContainSuccess(List<String> content) {
@@ -91,11 +123,11 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		return false;
 	}
 
-	private void preprocessBeforeExecuteTestScript(TestData testData, List<Device> devices) throws IOException {
+	private void preprocessBeforeExecuteTestScript(TestData testData, Pair pair) throws IOException {
 		System.out.println("【preprocessBeforeExecuteTestScript】 ");
 		List<String> content = readFile(mainTestRunner);
 		List<String> newContent = changeLibraryPath(content);
-		newContent = changeSerialNumber(newContent, devices);
+		newContent = changeSerialNumber(newContent, pair);
 		writeFile(mainTestRunner, newContent);
 	}
 
@@ -156,13 +188,15 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		return sb.toString();
 	}
 
-	private List<String> changeSerialNumber(List<String> content, List<Device> devices) {
+	private List<String> changeSerialNumber(List<String> content, Pair pair) {
 		List<String> newContent = new ArrayList<String>();
 		final String KERWORD_SET_SERIAL = "Set Serial";
 		final String KEYWORD_COMMENT = "comment";
 		String space = "";
 		int index = 0;
-
+		List<Device> devices = new ArrayList<Device>();
+		devices.add(pair.getPhone());
+		devices.add(pair.getWear());
 		for (int i = 0; i < CoreOptions.INTERVAL_SPACE_NUM; i++)
 			space += " ";
 

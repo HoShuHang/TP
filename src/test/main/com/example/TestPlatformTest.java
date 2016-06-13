@@ -2,6 +2,7 @@ package test.main.com.example;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class TestPlatformTest {
 	}
 
 	@Test
-	public void testGetDevices() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, InterruptedException {
+	public void testGetDevices() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException, InterruptedException, IOException {
 		// set devices to ADB
 		List<Device> devices = new ArrayList<Device>();
 		Device expectDeviceA = new Device("123","HTC","nosdcard");
@@ -44,7 +45,7 @@ public class TestPlatformTest {
 	}
 	
 	@Test
-	public void testGetPhones() throws NoSuchFieldException, SecurityException, InterruptedException, IllegalArgumentException, IllegalAccessException {
+	public void testGetPhones() throws NoSuchFieldException, SecurityException, InterruptedException, IllegalArgumentException, IllegalAccessException, IOException {
 		List<Device> expectPhones = new ArrayList<Device>();
 		Device expect = new Device("123", "Asus", "nosdcard");
 		expectPhones.add(expect);
@@ -57,7 +58,7 @@ public class TestPlatformTest {
 	}
 	
 	@Test
-	public void testGetWearable() throws NoSuchFieldException, SecurityException, InterruptedException, IllegalArgumentException, IllegalAccessException {
+	public void testGetWearable() throws NoSuchFieldException, SecurityException, InterruptedException, IllegalArgumentException, IllegalAccessException, IOException {
 		List<Device> expectWearable = new ArrayList<Device>();
 		Device expect = new Device("123", "Asus", "nosdcard, watch");
 		expectWearable.add(expect);

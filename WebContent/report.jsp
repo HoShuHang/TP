@@ -3,10 +3,14 @@
 <%@ page import="java.util.*"%>
 <%@ page import="main.com.example.entity.*"%>
 <%
-	final String TAG_REPORT_LIST = "report_list";
-	String index = request.getParameter("id");
-	List<Report> lstReport = (List<Report>) application.getAttribute(TAG_REPORT_LIST);
-	Report report = lstReport.get(Integer.parseInt(index));
+	String phone = request.getParameter("phone");
+	String watch = request.getParameter("wearable");
+	String detail = request.getParameter("detail");
+	System.out.println("jsp detail = " + detail);
+	String failCount = String.valueOf(detail.charAt(detail.indexOf("fail=")+5));
+	String totalCount = String.valueOf(detail.charAt(detail.indexOf("total=") + 6));
+	System.out.println("detail.indexOf(\"]\") = " + detail.indexOf("]"));
+	String message = detail.substring(detail.indexOf("message=[")+9, detail.indexOf("]"));
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -18,27 +22,27 @@
 	<h1>Test Summary</h1>
 	<p>
 		Phone:
-		<%=report.getPhone().getSerialNum()%></p>
+		<%=phone%></p>
 	<p>
 		Watch:
-		<%=report.getWatch().getSerialNum()%></p>
+		<%=watch%></p>
 	<table>
 		<tr>
 			<td>
 				<div class="infoBox" id="tests">
-					<div class="counter"><%=report.getTotalTestCase()%></div>
+					<div class="counter"><%=totalCount%></div>
 					<p>tests</p>
 				</div>
 			</td>
 			<td>
 				<div class="infoBox" id="failures">
-					<div class="counter"><%=report.getFailTestCaseNumber()%></div>
+					<div class="counter"><%=failCount%></div>
 					<p>failures</p>
 				</div>
 			</td>
 		</tr>
 		<tr>
-			<td align="left" colspan="2"><%=report.getTestingMessage()%></td>
+			<td align="left"><%=message%></td>
 		</tr>
 	</table>
 </body>

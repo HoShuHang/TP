@@ -2,6 +2,7 @@ package test.main.com.example;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ADBTest {
 
 	@Test
 	public void testGetDevicesWhenDevicesNotNull() throws NoSuchFieldException, SecurityException,
-			IllegalArgumentException, IllegalAccessException, InterruptedException {
+			IllegalArgumentException, IllegalAccessException, InterruptedException, IOException {
 		List<Device> devices = new ArrayList<Device>();
 		devices.add(this.device);
 		Field devicesField;

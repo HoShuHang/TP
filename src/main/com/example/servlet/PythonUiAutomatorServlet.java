@@ -33,15 +33,15 @@ import net.lingala.zip4j.exception.ZipException;
 @WebServlet(name = "PythonUiAutomatorServlet", urlPatterns = { "/execute" }, asyncSupported = true)
 @MultipartConfig
 public class PythonUiAutomatorServlet extends HttpServlet {
-//	final String HTML_NAME_TESTSCRIPT = "testscript";
-//	final String HTML_NAME_MOBILE_SERIAL_NUMBER = "mobile_serial_number";
-//	final String HTML_NAME_WEAR_SERIAL_NUMBER = "wear_serial_number";
-//	final String TAG_REPORT = "report";
-//	final String TAG_REPORT_SIZE = TAG_REPORT + "_size";
-//	final String TAG_MOBILE = "mobile";
-//	final String TAG_WEAR = "wear";
-//	final String SETTING_PY = "Setting.py";
-//	final String[] POST_PARAMS = { HTML_NAME_TESTSCRIPT, "apk" };
+	// final String HTML_NAME_TESTSCRIPT = "testscript";
+	// final String HTML_NAME_MOBILE_SERIAL_NUMBER = "mobile_serial_number";
+	// final String HTML_NAME_WEAR_SERIAL_NUMBER = "wear_serial_number";
+	// final String TAG_REPORT = "report";
+	// final String TAG_REPORT_SIZE = TAG_REPORT + "_size";
+	// final String TAG_MOBILE = "mobile";
+	// final String TAG_WEAR = "wear";
+	// final String SETTING_PY = "Setting.py";
+	// final String[] POST_PARAMS = { HTML_NAME_TESTSCRIPT, "apk" };
 	final String TAG_REPORT_LIST = "report_list";
 	private Lock lock = new ReentrantLock();
 	private LinkedList<AsyncContext> asyncContexts = new LinkedList<>();
@@ -59,11 +59,14 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		TestPlatform testPlatform = (TestPlatform) this.getServletContext().getAttribute("testPlatform");
-		List<Report> output = testPlatform.execute(testData);
-		ServletContext application = this.getServletContext();
-		application.setAttribute(TAG_REPORT_LIST, output);
+		testPlatform.setTestData(testData);
+		testPlatform.execute(testData);
+		// ServletContext application = this.getServletContext();
+		// application.setAttribute(TAG_REPORT_LIST, output);
+
 		// go to "report.jsp"
-		resp.sendRedirect("report_list.jsp");
+		req.setAttribute("pairs", testData.getPairs());
+		req.getRequestDispatcher("/report_list.jsp").forward(req, resp);
 	}
 
 	private TestData parseTestData(HttpServletRequest req)
@@ -78,7 +81,7 @@ public class PythonUiAutomatorServlet extends HttpServlet {
 		return testData;
 	}
 
-	private List<Device> parseDevices(HttpServletRequest req) throws InterruptedException {
+	private List<Device> parseDevices(HttpServletRequest req) throws InterruptedException, IOException {
 		List<Device> devices = new ArrayList<Device>();
 		for (Device device : ADB.getDevices()) {
 			if (req.getParameter(device.getModelAliasWithDash()) != null) {
