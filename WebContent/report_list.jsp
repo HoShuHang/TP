@@ -93,7 +93,10 @@ application.getAttribute(TAG_REPORT_LIST); %> --%>
 				if (index < 3)
 					row += '<td align="center">' + item[field] + '</td>';
 				else {
-					row += '<td align="center"><form action="report.jsp"><input type="hidden" name="phone" value="'+phone+'"><input type="hidden" name="wearable" value="'+wearable+'"><input type="hidden" name="detail" value="'+item[field]+'"><input type="submit" value="report"></form></td>';
+					if(item[field])
+						row += '<td align="center"><form action="report.jsp"><input type="hidden" name="phone" value="'+phone+'"><input type="hidden" name="wearable" value="'+wearable+'"><input type="hidden" name="detail" value="'+item[field]+'"><input type="submit" value="report"></form></td>';
+					else
+						row += '<td align="center"></td>';
 				}
 			});
 			rows += row + '</tr>';
