@@ -55,14 +55,6 @@ public class TestData {
 		return this.tool;
 	}
 
-	public Map<String, Object> toHashMap() {
-		Map<String, Object> maps = new HashMap<String, Object>();
-		// maps.put("mobile", value);
-		// maps.put("wearable", value);
-		// maps.put(key, value);
-		return maps;
-	}
-
 	public List<Pair> getPairs() {
 		return this.pairs;
 	}
