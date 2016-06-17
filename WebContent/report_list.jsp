@@ -21,6 +21,7 @@ application.getAttribute(TAG_REPORT_LIST); %> --%>
 
 
 
+
 <html>
 
 <head>
@@ -147,15 +148,7 @@ application.getAttribute(TAG_REPORT_LIST); %> --%>
 
 					<td align="center">${pair.getPhone().getSerialNum()}</td>
 					<td align="center">${pair.getWear().getSerialNum()}</td>
-
-					<c:choose>
-						<c:when test="${pair.isTestComplete()}">
-							<td align="center">complete</td>
-						</c:when>
-						<c:otherwise>
-							<td align="center">waiting for test</td>
-						</c:otherwise>
-					</c:choose>
+					<td align="center">waiting for test</td>
 
 					<%-- <td align="center">${pair.getReport().isPassTesting()}</td> --%>
 

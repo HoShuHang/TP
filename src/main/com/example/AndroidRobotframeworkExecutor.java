@@ -16,6 +16,7 @@ import main.com.example.entity.Device;
 import main.com.example.entity.Pair;
 import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
+import main.com.example.entity.TestStatus;
 import main.com.example.utility.CoreOptions;
 import main.com.example.utility.FileTypeFilter;
 import main.com.example.utility.Utility;
@@ -41,6 +42,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 		findTestRunner(testData.getProjectFullPath().substring(0, index));
 
 		for (Pair pair : testData.getPairs()) {
+			pair.setTestStatus(TestStatus.Testing);
 			Device phone = pair.getPhone();
 			Device wear = pair.getWear();
 			Report report = new Report();
@@ -59,7 +61,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			report.setTestingMessage(parser.getTestingMessage(testingMessage));
 			pair.setReport(report);
 			lstReport.add(report);
-			pair.setTestComplete(true);
+			pair.setTestStatus(TestStatus.Complete);
 		}
 
 //		for (Device phone : testData.getPhones()) {

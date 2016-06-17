@@ -15,6 +15,7 @@ import main.com.example.entity.Device;
 import main.com.example.entity.Pair;
 import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
+import main.com.example.entity.TestStatus;
 import main.com.example.utility.CoreOptions;
 import main.com.example.utility.Utility;
 import net.lingala.zip4j.core.ZipFile;
@@ -37,6 +38,7 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor {
 		HashMap<String, HashMap<String, String>> apkInfo = this.deviceController.getApkInfo(apkFiles);
 		
 		for (Pair pair : testData.getPairs()) {
+			pair.setTestStatus(TestStatus.Testing);
 			Device phone = pair.getPhone();
 			Device wear = pair.getWear();
 			Report report = new Report();
@@ -49,7 +51,7 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor {
 //			report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
 //			report.setTestingMessage(parser.getTestingMessage(testingMessage));
 			pair.setReport(report);
-			pair.setTestComplete(true);
+			pair.setTestStatus(TestStatus.Complete);
 			//HashMap<String, Object> report = new HashMap<String, Object>();
 //			report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
 //			report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());

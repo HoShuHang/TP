@@ -1,21 +1,21 @@
 package main.com.example.entity;
 
 public class Pair {
-	private boolean testComplete = false;
 	private Device phone, wear;
 	private Report report = null;
+	private TestStatus status = TestStatus.Waiting;
 
 	public Pair(Device phone, Device wear) {
 		this.phone = phone;
 		this.wear = wear;
 	}
 
-	public void setTestComplete(boolean complete) {
-		this.testComplete = complete;
+	public TestStatus getTestStatus() {
+		return this.status;
 	}
 
-	public boolean isTestComplete() {
-		return this.testComplete;
+	public void setTestStatus(TestStatus status) {
+		this.status = status;
 	}
 
 	public Device getPhone() {
@@ -31,7 +31,7 @@ public class Pair {
 	}
 
 	public Report getReport() {
-		if(this.report == null)
+		if (this.report == null)
 			throw new NullPointerException("return value is null at method getReport");
 		return this.report;
 	}

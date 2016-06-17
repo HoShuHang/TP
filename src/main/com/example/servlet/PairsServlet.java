@@ -22,6 +22,7 @@ import main.com.example.TestPlatform;
 import main.com.example.entity.Pair;
 import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
+import main.com.example.entity.TestStatus;
 import net.lingala.zip4j.exception.ZipException;
 
 @WebServlet(name = "PairsServlet", urlPatterns = { "/pairs" })
@@ -46,14 +47,11 @@ public class PairsServlet extends HttpServlet {
 			Map<String, String> map = new HashMap();
 			map.put("phone", pair.getPhone().getSerialNum());
 			map.put("watch", pair.getWear().getSerialNum());
-			if (pair.isTestComplete())
-				map.put("status", "complete");
-			else
-				map.put("status", "waiting for test");
-			if (pair.isTestComplete()){
+			map.put("status", pair.getTestStatus().toString());
+			if (pair.getTestStatus().equals(TestStatus.Complete)) {
 				map.put("detail", String.valueOf(this.parseReport(pair.getReport())));
 				System.out.println("detail = " + String.valueOf(this.parseReport(pair.getReport())));
-			}else
+			} else
 				map.put("detail", "");
 			JSONObject subJSON = new JSONObject(map);
 			pairsJSONArray.put(subJSON);
@@ -73,7 +71,7 @@ public class PairsServlet extends HttpServlet {
 
 	private boolean isAllComplete(List<Pair> pairs) {
 		for (Pair pair : pairs) {
-			if (!pair.isTestComplete())
+			if (!pair.getTestStatus().equals(TestStatus.Complete))
 				return false;
 		}
 		return true;
