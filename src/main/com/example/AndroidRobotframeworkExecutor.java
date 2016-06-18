@@ -47,12 +47,7 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			Device wear = pair.getWear();
 			Report report = new Report();
 			report.setPair(pair);
-			phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
-			phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-
 			preprocessBeforeExecuteTestScript(testData, pair);
-			phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
-					apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
 			List<String> testingMessage = execute(phone, wear);
 			report.setPassTestCaseNumber(parser.getPassTestCaseNumber(testingMessage));
 			report.setPassTesting(parser.isPassTesting(testingMessage));
@@ -64,57 +59,6 @@ public class AndroidRobotframeworkExecutor implements TestExecutor {
 			pair.setTestStatus(TestStatus.Complete);
 		}
 
-//		for (Device phone : testData.getPhones()) {
-//			for (Device wear : testData.getWearable()) {
-//				Report report = new Report();
-//				report.setPhone(phone);
-//				report.setWatch(wear);
-//				// report.add("-------------------Mobile: " +
-//				// phone.getSerialNum() + ",Wearable: " + wear.getSerialNum()
-//				// + "-------------------");
-//				// phone.turnOnBluetooth();
-//				// wear.clearWearGms();
-//				// wear.makeWearVisible();
-//				// phone.launchApp(CoreOptions.COMPANION_PACHAKGE,
-//				// CoreOptions.COMPANION_LAUNCHABLE_ACTIVITY);
-//				// phone.pair(wear);
-//				//
-//				phone.installApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PATH));
-//
-//				phone.installApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PATH));
-//				// List<String> result = wear
-//				// .waitWearInstallApp(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-//				// if (Utility.isContain(result, "Timeout")) {
-//				// List<String> reportContent = new ArrayList<String>();
-//				// reportContent.add("The app doesn't sync to watch.");
-//				// report.put(CoreOptions.TAG_REPORT, reportContent);
-//				// //// report.add("The app doesn't sync to watch.");
-//				// } else {
-//				List<Device> devices = new ArrayList<Device>();
-//				devices.add(phone);
-//				devices.add(wear);
-//				preprocessBeforeExecuteTestScript(testData, devices);
-//				phone.launchApp(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE),
-//						apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_LAUNCHABLE_ACTIVITY));
-//				List<String> testingMessage = execute(phone, wear);
-//				report.setPassTestCaseNumber(parser.getPassTestCaseNumber(testingMessage));
-//				report.setPassTesting(parser.isPassTesting(testingMessage));
-//				report.setFailTestCaseNumber(parser.getFailTestCaseNumber(testingMessage));
-//				report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
-//				report.setTestingMessage(parser.getTestingMessage(testingMessage));
-//				// report.addAll(execute(phone, wear));
-//				// }
-//				//
-//				// wear.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-//				//
-//				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_WEAR).get(CoreOptions.TAG_APK_PACKAGE));
-//				//
-//				// phone.uninstallApk(apkInfo.get(CoreOptions.TAG_MOBILE).get(CoreOptions.TAG_APK_PACKAGE));
-//				// phone.turnOffBluetooth();
-//				// phone.forgetWatch();
-//				lstReport.add(report);
-//			}
-//		}
 	}
 
 	private boolean isContainSuccess(List<String> content) {
