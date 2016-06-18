@@ -20,6 +20,8 @@ application.getAttribute(TAG_REPORT_LIST); %> --%>
 
 
 
+
+
 <html>
 
 <head>
@@ -52,9 +54,11 @@ application.getAttribute(TAG_REPORT_LIST); %> --%>
 <script
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
 <script type="text/javascript">
+	var last_response = '';
 	const
 	POLLING_INTERVAL = 10000;
 	window.onload = function() {
+		polling()
 		get_pairs = setInterval(polling, POLLING_INTERVAL);
 	}
 
@@ -64,6 +68,7 @@ application.getAttribute(TAG_REPORT_LIST); %> --%>
 			type : "GET",
 			success : function(response) {
 				response = $.parseJSON(response)
+				last_response = response
 				loadTable('table', [ 'phone', 'watch', 'status', 'detail' ],
 						response["pairs"]);
 				if (response["all_complete"]) {
@@ -81,23 +86,34 @@ application.getAttribute(TAG_REPORT_LIST); %> --%>
 		var phone = '';
 		var wearable = '';
 		rows += '<tr><td width="30%" align="center">Phone</td><td width="30%" align="center">Watch</td><td align="center">Status</td><td align="center">Detail</td></tr>';
-		$.each(jsonArray, function(index, item) {
-			var row = '<tr>';
-			$.each(fields, function(index, field) {
-				if(index == 0){
-					phone = item[field];
-				}
-				if(index == 1){
-					wearable = item[field];
-				}
-				if (index < 3)
-					row += '<td align="center">' + item[field] + '</td>';
-				else {
-					row += '<td align="center"><form action="report.jsp"><input type="hidden" name="phone" value="'+phone+'"><input type="hidden" name="wearable" value="'+wearable+'"><input type="hidden" name="detail" value="'+item[field]+'"><input type="submit" value="report"></form></td>';
-				}
-			});
-			rows += row + '</tr>';
-		});
+		$
+				.each(
+						jsonArray,
+						function(index, item) {
+							var row = '<tr>';
+							$
+									.each(
+											fields,
+											function(index, field) {
+												if (index == 0) {
+													phone = item[field];
+												}
+												if (index == 1) {
+													wearable = item[field];
+												}
+												if (index < 3)
+													row += '<td align="center">'
+															+ item[field]
+															+ '</td>';
+												else {
+													if (item[field])
+														row += '<td align="center"><form action="report.jsp"><input type="hidden" name="phone" value="'+phone+'"><input type="hidden" name="wearable" value="'+wearable+'"><input type="hidden" name="detail" value="'+item[field]+'"><input type="submit" value="report"></form></td>';
+													else
+														row += '<td align="center"><div class="loader"></div></td>';
+												}
+											});
+							rows += row + '</tr>';
+						});
 		$('#' + tableId).html(rows);
 	}
 </script>
@@ -132,15 +148,7 @@ application.getAttribute(TAG_REPORT_LIST); %> --%>
 
 					<td align="center">${pair.getPhone().getSerialNum()}</td>
 					<td align="center">${pair.getWear().getSerialNum()}</td>
-
-					<c:choose>
-						<c:when test="${pair.isTestComplete()}">
-							<td align="center">complete</td>
-						</c:when>
-						<c:otherwise>
-							<td align="center">waiting for test</td>
-						</c:otherwise>
-					</c:choose>
+					<td align="center">waiting for test</td>
 
 					<%-- <td align="center">${pair.getReport().isPassTesting()}</td> --%>
 

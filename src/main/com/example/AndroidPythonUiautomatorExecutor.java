@@ -15,6 +15,7 @@ import main.com.example.entity.Device;
 import main.com.example.entity.Pair;
 import main.com.example.entity.Report;
 import main.com.example.entity.TestData;
+import main.com.example.entity.TestStatus;
 import main.com.example.utility.CoreOptions;
 import main.com.example.utility.Utility;
 import net.lingala.zip4j.core.ZipFile;
@@ -37,6 +38,7 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor {
 		HashMap<String, HashMap<String, String>> apkInfo = this.deviceController.getApkInfo(apkFiles);
 		
 		for (Pair pair : testData.getPairs()) {
+			pair.setTestStatus(TestStatus.Testing);
 			Device phone = pair.getPhone();
 			Device wear = pair.getWear();
 			Report report = new Report();
@@ -49,7 +51,7 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor {
 //			report.setTotalTestCase(parser.getTotalTestCase(testingMessage));
 //			report.setTestingMessage(parser.getTestingMessage(testingMessage));
 			pair.setReport(report);
-			pair.setTestComplete(true);
+			pair.setTestStatus(TestStatus.Complete);
 			//HashMap<String, Object> report = new HashMap<String, Object>();
 //			report.put(CoreOptions.TAG_MOBILE, phone.getSerialNum());
 //			report.put(CoreOptions.TAG_WEAR, wear.getSerialNum());
@@ -78,96 +80,6 @@ public class AndroidPythonUiautomatorExecutor implements TestExecutor {
 //			}
 //			// phone.turnOffBluetooth();
 //		}
-	}
-
-	private void installApk(Device phone) throws IOException, InterruptedException {
-		System.out.println("【installApk】 " + phone.getSerialNum());
-		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
-		FileFilter filter = new FileFilterWithType("apk");
-		File[] files = folder.listFiles(filter);
-
-		for (File apk : files) {
-			System.out.println("APK: " + apk.getName());
-			List<String> command = new ArrayList<String>();
-			command.add(CoreOptions.ADB);
-			command.add("-s");
-			command.add(phone.getSerialNum());
-			command.add("install");
-			command.add(apk.getAbsolutePath());
-
-			ProcessBuilder proc = new ProcessBuilder(command);
-			Process p = proc.start();
-			StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-			StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-			stdinConsumer.start();
-			stderrConsumer.start();
-			p.waitFor();
-		}
-
-	}
-
-	private void launchApp(Device phone) throws IOException, InterruptedException {
-		System.out.println("【launchApp】 ");
-		final String KEY_PACKAGE = "package";
-		final String KEY_LAUNCHABLE_ACTIVITY = "launchable-activity";
-		File folder = new File(CoreOptions.UPLOAD_DIRECTORY);
-		FileFilter filter = new FileFilterWithType("apk");
-		File[] files = folder.listFiles(filter);
-
-		for (File apkFile : files) {
-			List<String> dumpContent = dumpApk(apkFile);
-			HashMap<String, String> info = getPackageAndActivity(dumpContent);
-			String packageName = info.get(KEY_PACKAGE);
-			String mainActivity = info.get(KEY_LAUNCHABLE_ACTIVITY);
-			if (packageName != null && mainActivity != null)
-				launch(phone, packageName, mainActivity);
-		}
-	}
-
-	private void launch(Device phone, String packageName, String mainActivity)
-			throws IOException, InterruptedException {
-		ProcessBuilder proc = new ProcessBuilder(CoreOptions.ADB, "-s", phone.getSerialNum(), "shell", "am", "start",
-				"-W", "-n", packageName + "/" + mainActivity);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-	}
-
-	private List<String> dumpApk(File apkFile) throws IOException, InterruptedException {
-		List<String> command = new ArrayList<String>();
-		command.add(CoreOptions.AAPT);
-		command.add("dump");
-		command.add("badging");
-		command.add(apkFile.getAbsolutePath());
-
-		ProcessBuilder proc = new ProcessBuilder(command);
-		Process p = proc.start();
-		StreamConsumer stdinConsumer = new StreamConsumer(p.getInputStream(), "【Input】");
-		StreamConsumer stderrConsumer = new StreamConsumer(p.getErrorStream(), "【Error】");
-		stdinConsumer.start();
-		stderrConsumer.start();
-		p.waitFor();
-		return stdinConsumer.getOutput();
-	}
-
-	private HashMap<String, String> getPackageAndActivity(List<String> content) {
-		HashMap<String, String> info = new HashMap<String, String>();
-		final String KEY_PACKAGE = "package";
-		final String KEY_LAUNCHABLE_ACTIVITY = "launchable-activity";
-		for (String line : content) {
-			if (line.contains(KEY_PACKAGE)) {
-				info.put(KEY_PACKAGE, getValue(line));
-				System.out.println(info.get(KEY_PACKAGE));
-			}
-			if (line.contains(KEY_LAUNCHABLE_ACTIVITY)) {
-				info.put(KEY_LAUNCHABLE_ACTIVITY, getValue(line));
-				System.out.println(info.get(KEY_LAUNCHABLE_ACTIVITY));
-			}
-		}
-		return info;
 	}
 
 	private String getValue(String line) {
