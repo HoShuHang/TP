@@ -122,7 +122,7 @@
 						<div class="caption-content">
 							<i class="fa fa-search-plus fa-3x"></i>
 						</div>
-					</div> <img src="img/one_m8.png" class="img-responsive" alt="">
+					</div> <img src="img/htc_butterfly2.png" class="img-responsive" alt="">
 				</a>
 			</div>
 			<div class="col-sm-4 device-item">
@@ -132,7 +132,7 @@
 						<div class="caption-content">
 							<i class="fa fa-search-plus fa-3x"></i>
 						</div>
-					</div> <img src="img/one_m8.png" class="img-responsive" alt="">
+					</div> <img src="img/sony_z3.png" class="img-responsive" alt="">
 				</a>
 			</div>
 			<div class="col-sm-4 device-item">
@@ -152,7 +152,7 @@
 						<div class="caption-content">
 							<i class="fa fa-search-plus fa-3x"></i>
 						</div>
-					</div> <img src="img/zenwatch2.png" class="img-responsive" alt="">
+					</div> <img src="img/sony_watch3.png" class="img-responsive" alt="">
 				</a>
 			</div>
 			<div class="col-sm-4 device-item">
@@ -162,7 +162,7 @@
 						<div class="caption-content">
 							<i class="fa fa-search-plus fa-3x"></i>
 						</div>
-					</div> <img src="img/zenwatch2.png" class="img-responsive" alt="">
+					</div> <img src="img/lg_urbane2.png" class="img-responsive" alt="">
 				</a>
 			</div>
 		</div>
