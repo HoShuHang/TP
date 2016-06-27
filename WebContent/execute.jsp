@@ -101,7 +101,7 @@
 				<c:forEach var="device" items="${phones}">
 					<div class="col-lg-4 col-sm-6 text-center">
 						<img class="img-circle img-responsive img-centered"
-							src="http://placehold.it/200x200" alt="">
+							src=${ device.getImage() } alt="">
 						<h3>
 							<input type="checkbox" name=${ device.getModelAliasWithDash() }
 								value=${ device.getSerialNum() }
@@ -122,7 +122,7 @@
 			<c:forEach var="device" items="${wearable}">
 				<div class="col-lg-4 col-sm-6 text-center">
 					<img class="img-circle img-responsive img-centered"
-						src="http://placehold.it/200x200" alt="">
+						src=${ device.getImage() } alt="">
 					<h3>
 						<input type="checkbox" name=${ device.getModelAliasWithDash() }
 							value=${ device.getSerialNum() }

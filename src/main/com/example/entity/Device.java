@@ -3,6 +3,7 @@ package main.com.example.entity;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import main.com.example.utility.CoreOptions;
 import main.com.example.utility.Utility;
@@ -11,6 +12,7 @@ public class Device {
 	private String serialNum;
 	private String modelAlias;
 	private String characteristic;
+	private String image;
 
 	public Device(String serialNum, String modelAlias, String characteristic) {
 		this.serialNum = serialNum;
@@ -28,6 +30,18 @@ public class Device {
 
 	public String getModelAliasWithDash() {
 		return this.modelAlias.replace(" ", "_");
+	}
+
+	public String getImage() {
+		Map<String, String> imageMaps = new HashMap<String, String>();
+		imageMaps.put("HT53VWZ01028", "img/htc_butterfly2_exec.png");
+		imageMaps.put("510KPNY0322975", "img/lg_urbane2.png");
+		imageMaps.put("CB5A259ZSX", "img/sony_z3_exec.png");
+		imageMaps.put("F2NZCY01033809E", "img/zenwatch2.png");
+		imageMaps.put("FA369W910377", "img/one_m8_exec.png");
+		if(imageMaps.get(this.getSerialNum())!=null)
+			return imageMaps.get(this.getSerialNum());
+		return "http://placehold.it/200x200";
 	}
 
 	public boolean isWearable() {
